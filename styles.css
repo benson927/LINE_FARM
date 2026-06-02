@@ -1148,10 +1148,11 @@ tbody tr:last-child td {
 }
 
 .log-filter-card {
-  max-width: 1180px;
+  width: 100%;
+  max-width: none;
   display: grid;
-  grid-template-columns: minmax(260px, 1fr) 260px 180px 260px auto;
-  gap: 28px;
+  grid-template-columns: minmax(220px, 1.25fr) minmax(220px, 0.85fr) minmax(150px, 0.55fr) minmax(210px, 0.7fr) auto;
+  gap: 18px;
   align-items: end;
   padding: 20px 28px;
   margin: 0 0 28px;
@@ -1161,6 +1162,7 @@ tbody tr:last-child td {
 }
 
 .log-field {
+  min-width: 0;
   display: grid;
   gap: 8px;
 }
@@ -1172,6 +1174,8 @@ tbody tr:last-child td {
 
 .filter-input,
 .date-button {
+  width: 100%;
+  min-width: 0;
   min-height: 42px;
   display: flex;
   align-items: center;

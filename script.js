@@ -1500,6 +1500,12 @@ document.querySelector("#createEventPlan").addEventListener("click", () => {
   showToast(`${name} 已建立`);
 });
 
+document.querySelector("#saveEventDetail").addEventListener("click", () => {
+  closeModals();
+  addAuditRecord("活動任務", "儲存金秋豐收節 2024 活動細節與進度設定。");
+  showToast("活動細節已儲存");
+});
+
 document.querySelectorAll("[data-close-modal]").forEach((button) => button.addEventListener("click", closeModals));
 overlay.addEventListener("click", closeModals);
 
