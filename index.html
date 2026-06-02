@@ -1,0 +1,1336 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="LINE 熊大農場管理系統前端展示版，包含玩家、配置、商城、活動、權限與日誌模組。" />
+    <title>LINE 熊大農場管理系統</title>
+    <link rel="icon" href="assets/line-game-brown.png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main id="loginView" class="login-shell">
+      <section class="login-card" aria-label="登入表單">
+        <img class="login-logo" src="assets/line-game-brown.png" alt="LINE 熊大農場" />
+        <h1>LINE 熊大農場管理系統</h1>
+
+        <form id="loginForm" class="login-form">
+          <label>
+            <span>登入角色 (Role)</span>
+            <select id="roleSelect">
+              <option>系統管理員</option>
+              <option>營運企劃</option>
+              <option>營運主管</option>
+              <option>客服人員</option>
+            </select>
+          </label>
+
+          <label>
+            <span>使用者名稱</span>
+            <input id="usernameInput" type="text" placeholder="員工 ID 或電子郵件" autocomplete="username" />
+          </label>
+
+          <label>
+            <span>密碼</span>
+            <span class="password-wrap">
+              <input id="passwordInput" type="password" placeholder="密碼" />
+              <button class="icon-button inside-input" type="button" id="togglePassword" aria-label="顯示密碼">◎</button>
+            </span>
+          </label>
+
+          <label class="remember-row">
+            <input type="checkbox" />
+            <span>記住我</span>
+          </label>
+
+          <button class="primary-button" type="submit">登入系統</button>
+          <button class="link-button" type="button">忘記密碼？請聯繫 IT 管理員</button>
+        </form>
+      </section>
+    </main>
+
+    <main id="appView" class="app-shell hidden">
+      <aside class="sidebar">
+        <div class="brand">
+          <img class="brand-mark" src="assets/line-game-brown.png" alt="LINE 熊大農場" />
+          <strong>LINE 熊大農場<br />管理系統</strong>
+        </div>
+
+        <nav class="side-nav" aria-label="主要功能">
+          <button class="nav-link dashboard-link active" data-page="dashboard">
+            <span class="nav-icon">▦</span>
+            <span>儀表板</span>
+          </button>
+
+          <section class="nav-group">
+            <button class="nav-group-head" type="button" aria-expanded="false">
+              <span class="nav-icon">♙</span>
+              <span>玩家管理</span>
+              <span class="chevron">⌃</span>
+            </button>
+            <div class="nav-sublist">
+              <button class="nav-link" data-page="playerBasic" data-title="玩家基本資料查詢">玩家基本資料查詢</button>
+              <button class="nav-link" data-page="playerInventory" data-title="玩家背包與庫存查詢">玩家背包與庫存查詢</button>
+              <button class="nav-link" data-page="playerCompensation" data-title="單筆客訴虛寶補償">單筆客訴虛寶補償</button>
+            </div>
+          </section>
+
+          <section class="nav-group">
+            <button class="nav-group-head" type="button" aria-expanded="false">
+              <span class="nav-icon">▣</span>
+              <span>遊戲配置</span>
+              <span class="chevron">⌃</span>
+            </button>
+            <div class="nav-sublist">
+              <button class="nav-link" data-page="productionConfig" data-title="動植物生產參數設定">動植物生產參數設定</button>
+              <button class="nav-link" data-page="recipeConfig" data-title="加工品合成配方管理">加工品合成配方管理</button>
+            </div>
+          </section>
+
+          <section class="nav-group">
+            <button class="nav-group-head" type="button" aria-expanded="false">
+              <span class="nav-icon">▱</span>
+              <span>商店銷售</span>
+              <span class="chevron">⌃</span>
+            </button>
+            <div class="nav-sublist">
+              <button class="nav-link" data-page="shopSchedule" data-title="商城商品上架與排程">商城商品上架與排程</button>
+              <button class="nav-link" data-page="shopPromotions" data-title="促銷定價與折扣設定">促銷定價與折扣設定</button>
+              <button class="nav-link" data-page="shopOrders" data-title="玩家訂單紀錄查詢">玩家訂單紀錄查詢</button>
+              <button class="nav-link" data-page="shopRevenue" data-title="營收統計報表匯出">營收統計報表匯出</button>
+            </div>
+          </section>
+
+          <section class="nav-group">
+            <button class="nav-group-head" type="button" aria-expanded="false">
+              <span class="nav-icon">□</span>
+              <span>活動任務</span>
+              <span class="chevron">⌃</span>
+            </button>
+            <div class="nav-sublist">
+              <button class="nav-link" data-page="eventTasks" data-title="節慶活動與任務管理">節慶活動與任務管理</button>
+              <button class="nav-link" data-page="mailRewards" data-title="全服信件與批次派獎">全服信件與批次派獎</button>
+            </div>
+          </section>
+
+          <section class="nav-group">
+            <button class="nav-group-head" type="button" aria-expanded="false">
+              <span class="nav-icon">♙</span>
+              <span>權限控制</span>
+              <span class="chevron">⌃</span>
+            </button>
+            <div class="nav-sublist">
+              <button class="nav-link" data-page="staff" data-title="內部員工帳號管理">內部員工帳號管理</button>
+              <button class="nav-link" data-page="permissions" data-title="角色權限分級設定">角色權限分級設定</button>
+              <button class="nav-link" data-page="audit" data-title="系統操作稽核日誌">系統操作稽核日誌</button>
+            </div>
+          </section>
+        </nav>
+      </aside>
+
+      <section class="workspace">
+        <header class="topbar">
+          <label class="search-box">
+            <span>⌕</span>
+            <input type="search" placeholder="搜尋管理員姓名或ID..." />
+          </label>
+          <div class="top-actions">
+            <button id="notificationButton" class="icon-button has-dot" type="button" aria-label="通知">●</button>
+            <button id="settingsButton" class="icon-button" type="button" aria-label="設定">⚙</button>
+            <span class="divider"></span>
+            <button id="userMenuButton" class="user-chip" type="button">
+              <span class="avatar"></span>
+              <span id="currentRole">管理員</span>
+              <span>⌄</span>
+            </button>
+          </div>
+
+          <div id="userMenu" class="user-menu hidden">
+            <div class="user-profile">
+              <span class="avatar large"></span>
+              <div>
+                <strong>user</strong>
+                <small>ID: EMP-001</small>
+              </div>
+            </div>
+            <button type="button">⚙ 帳號設定</button>
+            <button id="logoutButton" class="danger-link" type="button">↪ 登出系統</button>
+          </div>
+
+          <section id="notificationMenu" class="top-dropdown notification-dropdown hidden" aria-label="通知中心">
+            <header>
+              <h3>通知中心</h3>
+              <button id="markAllRead" class="link-button success-text" type="button">全部標示為已讀</button>
+            </header>
+            <div id="notificationList"></div>
+          </section>
+
+          <section id="settingsMenu" class="top-dropdown settings-dropdown hidden" aria-label="設定選單">
+            <button class="setting-row" type="button" data-setting-panel="language">
+              <span class="setting-icon">◎</span>
+              <strong>介面語言</strong>
+              <em id="currentLanguageLabel">繁體中文</em>
+              <b>›</b>
+            </button>
+            <button class="setting-row" type="button" data-setting-panel="fontSize">
+              <span class="setting-icon">Tt</span>
+              <strong>介面文字大小</strong>
+              <em id="currentFontSizeLabel">標準</em>
+              <b>›</b>
+            </button>
+            <button class="setting-row" type="button" data-setting-panel="idleTime">
+              <span class="setting-icon">▣</span>
+              <strong>閒置自動登出</strong>
+              <em id="currentIdleLabel">15 分鐘</em>
+              <b>›</b>
+            </button>
+          </section>
+        </header>
+
+        <section id="dashboardPage" class="page active-page">
+          <div class="page-heading">
+            <h2>歡迎回來，今日概覽</h2>
+            <p>最後同步：<span class="success-text">剛剛</span></p>
+          </div>
+
+          <div class="metric-grid">
+            <article class="metric-card">
+              <div class="metric-top"><span class="metric-icon green">♙</span><b>↗+5%</b></div>
+              <p>當日活躍玩家</p>
+              <strong>124,892</strong>
+            </article>
+            <article class="metric-card">
+              <div class="metric-top"><span class="metric-icon rose">▣</span><b>↗+5%</b></div>
+              <p>待處理客服工單</p>
+              <strong>42</strong>
+            </article>
+            <article class="metric-card">
+              <div class="metric-top"><span class="metric-icon teal">▾</span><b>↗+5%</b></div>
+              <p>進行中活動</p>
+              <strong>12</strong>
+            </article>
+            <article class="metric-card">
+              <div class="metric-top"><span class="metric-icon red">△</span><b>↗+5%</b></div>
+              <p>系統警示</p>
+              <strong>3</strong>
+            </article>
+          </div>
+
+          <section class="status-strip">
+            <div class="sync-badge">↻</div>
+            <div>
+              <h3>伺服器資料庫同步狀態</h3>
+              <p><span class="dot green-dot"></span>連線中 / 同步中 <span class="server-name">SEA-Alpha-01</span></p>
+            </div>
+            <dl>
+              <div><dt>平均延遲</dt><dd>24ms</dd></div>
+              <div><dt>數據吞吐量</dt><dd>1.2 GB/s</dd></div>
+            </dl>
+          </section>
+
+          <section class="panel">
+            <div class="panel-title">
+              <h3>近期管理員操作</h3>
+              <button id="goAuditLog" class="link-button success-text" type="button">查看所有日誌 →</button>
+            </div>
+            <table>
+              <thead>
+                <tr><th>時間</th><th>管理員姓名</th><th>執行操作</th><th>對象 ID</th><th>狀態</th></tr>
+              </thead>
+              <tbody id="recentLogs"></tbody>
+            </table>
+          </section>
+
+          <div class="bottom-alerts">
+            <p class="warning">ⓘ 警告：東京節點 Node-04 偵測到延遲激增，自動路由切換中。</p>
+            <p class="maintenance">◷ 預計維護倒數 4h 22m</p>
+          </div>
+        </section>
+
+        <section id="staffPage" class="page">
+          <div class="page-heading with-actions">
+            <div>
+              <h2>內部員工帳號管理</h2>
+              <p>配置及管理後台操作員的訪問權限與安全設置</p>
+            </div>
+            <div class="heading-actions">
+              <button id="goPermissions" class="outline-button" type="button">角色權限設定</button>
+              <button id="openExport" class="outline-button" type="button">⇩ 匯出 CSV</button>
+            </div>
+          </div>
+
+          <div class="metric-grid staff-metrics">
+            <article class="metric-card"><p>總管理員</p><strong>12</strong><span class="mini-icon">♚</span></article>
+            <article class="metric-card"><p>活躍中</p><strong>8</strong><span class="progress-line"><i></i></span></article>
+            <article class="metric-card"><p>已封禁</p><strong>1</strong><small class="danger-text">需審核</small></article>
+            <article class="metric-card"><p>角色類型</p><strong>4</strong><span class="role-dots"><i></i><i></i><i></i><i></i></span></article>
+          </div>
+
+          <section class="panel">
+            <div class="panel-title">
+              <h3>帳號清單</h3>
+              <button id="openExportSmall" class="outline-button small" type="button">⇩ 匯出 CSV</button>
+            </div>
+            <table class="staff-table">
+              <thead>
+                <tr><th>ID</th><th>管理員姓名 / 信箱</th><th>存取角色</th><th>最後登入</th><th>狀態</th><th>操作</th></tr>
+              </thead>
+              <tbody id="staffRows"></tbody>
+            </table>
+          </section>
+        </section>
+
+        <section id="playerBasicPage" class="page">
+          <div class="page-heading">
+            <h2>玩家基本資料查詢</h2>
+            <p>查詢玩家帳號狀態、基本資訊、登入紀錄與風險標記。</p>
+          </div>
+
+          <section class="player-filter-card">
+            <label class="player-search">⌕ <input id="playerSearchInput" type="search" placeholder="輸入 UID、暱稱、LINE ID 或 Email..." /></label>
+            <select id="playerStatusFilter">
+              <option value="all">全部狀態</option>
+              <option>正常</option>
+              <option>凍結</option>
+              <option>觀察中</option>
+            </select>
+            <button id="resetPlayerSearch" class="outline-button" type="button">重置</button>
+          </section>
+
+          <div class="player-layout">
+            <section class="panel player-table-panel">
+              <div class="panel-title">
+                <h3>玩家清單</h3>
+                <span id="playerResultCount">0 筆玩家</span>
+              </div>
+              <table>
+                <thead>
+                  <tr><th>UID</th><th>玩家</th><th>等級</th><th>VIP</th><th>最後登入</th><th>狀態</th><th>操作</th></tr>
+                </thead>
+                <tbody id="playerRows"></tbody>
+              </table>
+            </section>
+
+            <aside class="player-profile-card" id="playerProfileCard">
+              <p>請從左側選擇一位玩家</p>
+            </aside>
+          </div>
+        </section>
+
+        <section id="playerInventoryPage" class="page">
+          <div class="page-heading">
+            <h2>玩家背包與庫存查詢</h2>
+            <p>檢視玩家背包道具、倉庫資源、貨幣餘額與異常庫存標記。</p>
+          </div>
+
+          <section class="player-filter-card">
+            <label class="player-search">⌕ <input id="inventoryPlayerSearch" type="search" placeholder="輸入 UID 或玩家暱稱..." /></label>
+            <select id="inventoryCategoryFilter">
+              <option value="all">全部分類</option>
+              <option>貨幣</option>
+              <option>作物</option>
+              <option>道具</option>
+              <option>素材</option>
+            </select>
+            <button id="resetInventoryFilter" class="outline-button" type="button">重置</button>
+          </section>
+
+          <div class="inventory-layout">
+            <section class="panel inventory-player-panel">
+              <div class="panel-title">
+                <h3>玩家索引</h3>
+              </div>
+              <div id="inventoryPlayerList" class="inventory-player-list"></div>
+            </section>
+
+            <section class="panel inventory-panel">
+              <div class="panel-title">
+                <h3 id="inventoryTitle">玩家庫存</h3>
+                <button id="flagInventory" class="outline-button small" type="button">標記異常</button>
+              </div>
+              <div id="currencySummary" class="currency-summary"></div>
+              <table>
+                <thead>
+                  <tr><th>分類</th><th>道具名稱</th><th>數量</th><th>取得來源</th><th>最後異動</th></tr>
+                </thead>
+                <tbody id="inventoryRows"></tbody>
+              </table>
+            </section>
+          </div>
+        </section>
+
+        <section id="playerCompensationPage" class="page">
+          <div class="page-heading">
+            <h2>單筆客訴虛寶補償</h2>
+            <p>針對單一玩家 UID 進行客服補償，並寫入系統操作稽核日誌。</p>
+          </div>
+
+          <div class="comp-layout">
+            <section class="mail-editor compensation-editor">
+              <h3>補償申請表</h3>
+              <label class="stack-field">
+                <span>玩家 UID *</span>
+                <input id="compUid" type="text" placeholder="例如：USR-882910" />
+              </label>
+              <label class="stack-field">
+                <span>客訴單號 *</span>
+                <input id="ticketId" type="text" placeholder="例如：CS-20260602-001" />
+              </label>
+              <label class="stack-field">
+                <span>補償原因</span>
+                <select id="compReason">
+                  <option>活動獎勵未到帳</option>
+                  <option>商城購買異常</option>
+                  <option>伺服器維護補償</option>
+                  <option>客服人工判定</option>
+                </select>
+              </label>
+              <label class="stack-field">
+                <span>處理備註</span>
+                <textarea id="compNote" placeholder="輸入處理原因、證據摘要或主管核准資訊..."></textarea>
+              </label>
+              <hr />
+              <div class="reward-box">
+                <p>補償項目</p>
+                <div id="compItems" class="reward-grid"></div>
+                <button id="addCompItem" class="outline-button full-button" type="button">＋ 新增補償項目</button>
+              </div>
+              <div class="mail-actions">
+                <button id="previewComp" class="outline-button" type="button">預覽補償</button>
+                <button id="submitComp" class="primary-button compact" type="button">送出補償</button>
+              </div>
+            </section>
+
+            <aside class="mail-side">
+              <article class="side-card">
+                <h3>補償風控摘要</h3>
+                <p>今日補償筆數 <strong id="compCount">7</strong></p>
+                <p>待主管覆核 <strong>2</strong></p>
+                <p>高額補償警示 <strong class="danger-text">1</strong></p>
+              </article>
+              <article class="side-card history-card">
+                <div class="panel-title flat">
+                  <h3>近期補償紀錄</h3>
+                </div>
+                <ul id="compHistory"></ul>
+              </article>
+            </aside>
+          </div>
+        </section>
+
+        <section id="permissionsPage" class="page">
+          <div class="page-heading with-actions">
+            <div>
+              <h2>角色權限分級設定</h2>
+              <p>設定系統內各組織職位之操作功能與資料存取範圍</p>
+            </div>
+            <div class="heading-actions">
+              <button id="cancelPermissionChanges" class="outline-button" type="button">取消修改</button>
+              <button id="savePermissions" class="primary-button compact" type="button">儲存變更設定</button>
+            </div>
+          </div>
+
+          <div class="permission-layout">
+            <section class="permission-matrix">
+              <div class="role-tabs">
+                <button class="active" type="button" data-role="系統管理員">系統管理員</button>
+                <button type="button" data-role="營運主管">營運主管</button>
+                <button type="button" data-role="營運企劃">營運企劃</button>
+                <button type="button" data-role="客服人員">客服人員</button>
+                <span id="editingRole">編輯中：系統管理員權限</span>
+              </div>
+              <div class="matrix-head"><span>MODULE</span><span>權限項目與說明</span><span>狀態</span></div>
+              <div id="permissionRows"></div>
+            </section>
+
+            <aside class="audit-side">
+              <article class="audit-card">
+                <h3>權限審計快報</h3>
+                <p>稽核日誌保存天數 <b class="pill">180 天 合規</b></p>
+                <p>上次全局權限審查 <b>2026-05-15 10:00</b></p>
+                <p>目前高風險等級 <b class="danger-text">2 人</b></p>
+              </article>
+              <article class="audit-card">
+                <h3>權限異動紀錄</h3>
+                <ol>
+                  <li>今天 14:22 管理員 陳志明 修改了營運企劃的商域商品上架權限。</li>
+                  <li>昨天 09:15 管理員 黃健弘 建立了新管理員帳號。</li>
+                  <li>2026-05-20 系統自動凍結逾期未登入帳號。</li>
+                </ol>
+              </article>
+              <button id="openAddRole" class="primary-button" type="button">＋ 新增角色</button>
+            </aside>
+          </div>
+        </section>
+
+        <section id="auditLogPage" class="page">
+          <div class="page-heading">
+            <h2>日誌檢視中心</h2>
+            <p>監控與記錄後台系統的所有管理操作行為，確保數據安全與合規性。</p>
+          </div>
+
+          <section class="log-filter-card">
+            <div class="log-field search-field">
+              <label>搜尋管理員姓名、動作或 Table...</label>
+              <div class="filter-input">⌕ <input id="auditSearchInput" type="search" placeholder="搜尋..." /></div>
+            </div>
+            <div class="log-field">
+              <label>選擇日期範圍</label>
+              <button id="dateRangeButton" class="date-button" type="button">▣ 2026-05-07 - 2026-05-25</button>
+            </div>
+            <div class="log-field">
+              <label>動作類型</label>
+              <select id="auditActionFilter">
+                <option value="all">全部類型</option>
+                <option>權限安全</option>
+                <option>帳號管理</option>
+                <option>數據報表</option>
+                <option>系統維護</option>
+                <option>活動任務</option>
+              </select>
+            </div>
+            <button id="openLogExport" class="primary-button export-log-button" type="button">⇩ 匯出日誌報表 (PDF/CSV)</button>
+            <button id="resetAuditFilters" class="outline-button reset-log-button" type="button">重置篩選</button>
+          </section>
+
+          <div class="log-summary-row">
+            <span id="auditResultCount">目前顯示 0 筆</span>
+            <button id="sortAuditTime" class="link-button success-text" type="button">依時間排序 ↓</button>
+          </div>
+
+          <section class="log-table-wrap">
+            <table class="log-table">
+              <thead>
+                <tr><th>日誌 ID</th><th>操作時間</th><th>操作人員</th><th>動作</th><th>執行動作</th></tr>
+              </thead>
+              <tbody id="auditRows"></tbody>
+            </table>
+          </section>
+
+          <div class="pagination-row">
+            <button id="prevAuditPage" class="outline-button small" type="button">上一頁</button>
+            <span id="auditPageLabel">第 1 / 1 頁</span>
+            <button id="nextAuditPage" class="outline-button small" type="button">下一頁</button>
+          </div>
+        </section>
+
+        <section id="eventTasksPage" class="page">
+          <div class="page-heading with-actions compact-heading">
+            <div>
+              <h2>節慶活動與任務管理</h2>
+            </div>
+            <button id="openEventPlan" class="primary-button compact" type="button">＋ 新增活動方案</button>
+          </div>
+
+          <div class="event-dashboard">
+            <section class="event-main">
+              <h3>進行中與預告活動</h3>
+              <div class="event-card-grid">
+                <article class="campaign-card">
+                  <div class="campaign-title-row">
+                    <h4>金秋豐收節 2024</h4>
+                    <span class="status-pill ok">● 進行中</span>
+                  </div>
+                  <p>Oct 1 - Oct 31</p>
+                  <label>活動進度 <b>88%</b></label>
+                  <div class="progress-track"><i style="width:88%"></i></div>
+                  <div class="campaign-actions">
+                    <button id="openEventDetail" class="outline-button" type="button">管理細節</button>
+                    <button id="openEventAnalytics" class="primary-button compact" type="button">數據分析</button>
+                  </div>
+                </article>
+
+                <article class="campaign-card">
+                  <div class="campaign-title-row">
+                    <h4>未來科技周：基因改良</h4>
+                    <span class="status-pill neutral">預告中</span>
+                  </div>
+                  <p>Nov 15 - Nov 22</p>
+                  <label>距離上線還有</label>
+                  <div class="countdown-grid">
+                    <strong>14<span>天</span></strong>
+                    <strong>08<span>時</span></strong>
+                  </div>
+                  <button id="editPreviewEvent" class="outline-button full-button" type="button">編輯預覽</button>
+                </article>
+              </div>
+
+              <div class="task-title-row">
+                <h3>活動任務清單</h3>
+                <label class="table-search">⌕ <input id="taskSearch" type="search" placeholder="搜尋任務 ID 或名稱..." /></label>
+              </div>
+              <section class="panel task-panel">
+                <table>
+                  <thead>
+                    <tr><th>ID</th><th>任務內容</th><th>獎勵詳情</th><th>完成率</th><th>狀態</th><th>操作</th></tr>
+                  </thead>
+                  <tbody id="taskRows"></tbody>
+                </table>
+              </section>
+            </section>
+
+            <aside class="event-side">
+              <article class="side-card calendar-card">
+                <h3>活動日曆</h3>
+                <div class="calendar-head"><button type="button">‹</button><strong>October 2024</strong><button type="button">›</button></div>
+                <div class="calendar-grid">
+                  <b>Su</b><b>Mo</b><b>Tu</b><b>We</b><b>Th</b><b>Fr</b><b>Sa</b>
+                  <span class="muted-day">29</span><span class="muted-day">30</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                  <span>6</span><span>7</span><span class="marked">8</span><span class="dot-day">9</span><span>10</span><span>11</span><span>12</span>
+                  <span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span>
+                </div>
+              </article>
+
+              <article class="side-card overview-card">
+                <h3>全服活動概覽</h3>
+                <p>Total Participants</p>
+                <strong>1.2M+</strong>
+                <hr />
+                <p>Avg Completion</p>
+                <strong>64.5% <small>↗ +2.1%</small></strong>
+              </article>
+
+              <div class="mini-stat-grid">
+                <article class="side-card mini-stat"><span>♙</span><p>當前在線</p><strong>42,901</strong></article>
+                <article class="side-card mini-stat"><span>♡</span><p>昨日贊助</p><strong>15.2k</strong></article>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section id="shopSchedulePage" class="page">
+          <div class="page-heading with-actions">
+            <div>
+              <h2>商城商品上架排程</h2>
+              <p>管理商城商品檔期、售價、狀態與活動衝突。</p>
+            </div>
+            <button id="openShopCreate" class="primary-button compact" type="button">＋ 新增排程</button>
+          </div>
+
+          <div class="shop-layout">
+            <section class="shop-main">
+              <div class="shop-tabs">
+                <button id="showShopCalendar" class="active" type="button">日曆視圖</button>
+                <button id="showShopList" type="button">排程列表</button>
+              </div>
+              <section id="shopCalendarView" class="panel shop-calendar-panel">
+                <div class="calendar-toolbar">
+                  <strong>2026年05月</strong>
+                  <span><i class="dot green-dot"></i>進行中 <i class="dot muted-dot"></i>待發布 <i class="dot gray-dot"></i>已結束</span>
+                </div>
+                <div id="shopCalendarGrid" class="shop-calendar-grid"></div>
+              </section>
+              <section id="shopListView" class="panel hidden">
+                <table>
+                  <thead><tr><th>商品名稱</th><th>狀態</th><th>排程時間</th><th>售價</th><th>操作</th></tr></thead>
+                  <tbody id="shopScheduleRows"></tbody>
+                </table>
+              </section>
+              <section class="panel recent-shop-log">
+                <div class="panel-title"><h3>最近操作紀錄</h3><button class="link-button success-text" type="button">查看全部</button></div>
+                <ul id="shopRecentLogs"></ul>
+              </section>
+            </section>
+
+            <aside class="shop-side">
+              <article class="side-card"><h3>未來 7 天發布</h3><strong class="big-number">5 個新活動</strong><p>下一個：限時皮膚包 <b class="success-text">明天 10:00</b></p></article>
+              <article class="side-card danger-side"><h3>即將結束警示</h3><p>秋季收穫包 <strong class="danger-text">4h</strong></p><p>萬聖節裝飾 <strong>1d</strong></p><button class="outline-button full-button" type="button">查看詳情</button></article>
+              <article class="side-card"><h3>商品預覽</h3><div class="product-preview-grid"><div></div><div></div></div></article>
+            </aside>
+          </div>
+        </section>
+
+        <section id="shopCreatePage" class="page">
+          <div class="page-heading with-actions">
+            <div><h2>新增商品排程</h2><p>為您的農場策劃下一個促銷活動，精準觸達目標玩家群體。</p></div>
+            <div class="heading-actions"><button id="cancelShopCreate" class="outline-button" type="button">取消</button><button id="saveShopSchedule" class="primary-button compact" type="button">保存並發布</button></div>
+          </div>
+          <div class="shop-create-layout">
+            <section class="shop-form-stack">
+              <article class="form-section-card">
+                <h3>▣ 商品基礎信息</h3>
+                <label class="stack-field"><span>選擇上架商品</span><input id="shopProductName" type="text" placeholder="搜索商品名稱或 ID (例如: 超級農場禮盒)" /></label>
+                <div class="tag-row"><button type="button">推薦: 限定皮膚 ＋</button><button type="button">推薦: 種子包裹 ＋</button></div>
+                <div class="two-col-form"><label class="stack-field"><span>排程名稱</span><input id="shopScheduleName" type="text" placeholder="例如: 2024 秋季限定促銷" /></label><label class="stack-field"><span>優先級</span><select><option>普通(Normal)</option><option>高(High)</option></select></label></div>
+              </article>
+              <article class="form-section-card">
+                <h3>◷ 銷售時程設定</h3>
+                <div class="two-col-form"><label class="stack-field"><span>開始日期與時間</span><input id="shopStartDate" type="text" placeholder="mm/dd/yyyy, --:-- --" /></label><label class="stack-field"><span>結束日期與時間</span><input id="shopEndDate" type="text" placeholder="mm/dd/yyyy, --:-- --" /></label></div>
+              </article>
+              <div class="two-col-form">
+                <article class="form-section-card"><h3>⌘ 銷售渠道</h3><label class="check-row"><span>遊戲內商店</span><input type="checkbox" checked /></label><label class="check-row"><span>彈出視窗公告</span><input type="checkbox" /></label><label class="check-row"><span>系統直接郵件</span><input type="checkbox" /></label></article>
+                <article class="form-section-card"><h3>◎ 可見性規則</h3><label class="radio-row"><input name="visibility" type="radio" checked />全體玩家 (All Players)</label><label class="radio-row"><input name="visibility" type="radio" />僅限新玩家 (New Only)</label><label class="radio-row"><input name="visibility" type="radio" />僅限 VIP 玩家 (VIP Only)</label></article>
+              </div>
+            </section>
+            <aside class="shop-side">
+              <article class="side-card conflict-card"><h3>△ 衝突檢測 <span>DETECTED</span></h3><p>所選期間內發現 1 個重大活動重疊：</p><div class="conflict-box"><strong>萬聖節主題慶典</strong><small>10月25日 - 11月07日</small><b>重疊 100%</b></div><p>商品流量可能被萬聖節活動商店稀釋。</p><button class="outline-button full-button" type="button">查看完整行事曆</button></article>
+              <article class="side-card preview-card"><h3>◎ 終端預覽</h3><div class="product-hero"></div><h4>超級農場禮盒</h4><strong>$ 19.99 <small>$34.99</small></strong><p>適用對象: 全體玩家</p></article>
+            </aside>
+          </div>
+        </section>
+
+        <section id="shopPromotionsPage" class="page">
+          <div class="page-heading with-actions"><div><h2>促銷定價與折扣設定</h2><p>設定商品折扣、優惠碼與分眾價格。</p></div><button id="addPromotion" class="primary-button compact" type="button">＋ 新增促銷</button></div>
+          <section class="panel"><table><thead><tr><th>促銷名稱</th><th>折扣</th><th>適用商品</th><th>期間</th><th>狀態</th><th>操作</th></tr></thead><tbody id="promotionRows"></tbody></table></section>
+        </section>
+
+        <section id="shopOrdersPage" class="page">
+          <div class="page-heading"><h2>玩家訂單紀錄查詢</h2><p>查詢玩家商城訂單、付款狀態與退款處理。</p></div>
+          <section class="player-filter-card"><label class="player-search">⌕ <input id="orderSearch" type="search" placeholder="搜尋訂單 ID、玩家 UID 或商品..." /></label><select id="orderStatusFilter"><option value="all">全部狀態</option><option>已付款</option><option>退款中</option><option>已退款</option></select><button id="resetOrderSearch" class="outline-button" type="button">重置</button></section>
+          <section class="panel"><table><thead><tr><th>訂單 ID</th><th>玩家 UID</th><th>商品</th><th>金額</th><th>付款時間</th><th>狀態</th><th>操作</th></tr></thead><tbody id="orderRows"></tbody></table></section>
+        </section>
+
+        <section id="shopRevenuePage" class="page">
+          <div class="page-heading with-actions"><div><h2>營收統計報表匯出</h2><p>彙整商城營收、品項銷售與轉換率。</p></div><button id="exportRevenue" class="primary-button compact" type="button">⇩ 匯出報表</button></div>
+          <div class="metric-grid"><article class="metric-card"><p>本月營收</p><strong>$128.4k</strong></article><article class="metric-card"><p>成功訂單</p><strong>8,920</strong></article><article class="metric-card"><p>退款率</p><strong>1.8%</strong></article><article class="metric-card"><p>ARPPU</p><strong>$14.4</strong></article></div>
+          <section class="panel"><div class="panel-title"><h3>商品營收排行</h3></div><table><thead><tr><th>商品</th><th>售出</th><th>營收</th><th>轉換率</th></tr></thead><tbody id="revenueRows"></tbody></table></section>
+        </section>
+
+        <section id="mailRewardsPage" class="page">
+          <div class="page-heading">
+            <h2>全服信件與批次派獎</h2>
+          </div>
+
+          <div class="mail-layout">
+            <section class="mail-editor">
+              <h3>信件與獎勵配置編輯器</h3>
+              <label class="stack-field">
+                <span>信件標題</span>
+                <input id="mailTitle" type="text" placeholder="請輸入全服信件標題..." />
+              </label>
+              <label class="stack-field">
+                <span>發送對象</span>
+                <select id="mailAudience">
+                  <option>全服玩家 (All Users)</option>
+                  <option>活躍玩家</option>
+                  <option>30 天未登入玩家</option>
+                  <option>活動參與玩家</option>
+                </select>
+              </label>
+              <label class="stack-field">
+                <span>信件內文</span>
+                <textarea id="mailBody" class="mail-textarea" placeholder="請輸入信件內容..."></textarea>
+              </label>
+
+              <hr />
+              <div class="reward-box">
+                <p>附加附件獎勵</p>
+                <div id="rewardItems" class="reward-grid"></div>
+                <button id="addRewardItem" class="outline-button full-button" type="button">＋ 新增獎勵道具</button>
+              </div>
+              <hr />
+              <div class="mail-actions">
+                <button id="saveMailDraft" class="outline-button" type="button">儲存為草稿</button>
+                <button id="sendMailNow" class="primary-button compact" type="button">▷ 立即發送全服信件</button>
+              </div>
+            </section>
+
+            <aside class="mail-side">
+              <article class="side-card delivery-card">
+                <h3>近期派發數據</h3>
+                <p>本月已發送信件 <strong>12 封</strong></p>
+                <p>派發成功率 <strong>99.9% <span class="status-pill ok">Excellent</span></strong></p>
+              </article>
+              <article class="side-card history-card">
+                <div class="panel-title flat">
+                  <h3>歷史發送日誌</h3>
+                  <button class="link-button success-text" type="button">檢視全部</button>
+                </div>
+                <ul id="mailHistory"></ul>
+              </article>
+              <div class="mini-stat-grid">
+                <article class="side-card mini-stat"><span>▱</span><p>待發送草稿</p><strong id="draftCount">2</strong></article>
+                <article class="side-card mini-stat"><span>◎</span><p>本週點擊率</p><strong>94.2%</strong></article>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section id="productionConfigPage" class="page">
+          <div class="page-heading with-actions compact-heading">
+            <div>
+              <h2>動植物生產參數設定</h2>
+              <p>調整作物與畜產的解鎖等級、生產時間、產出數量、售價與上線狀態。</p>
+            </div>
+            <div class="heading-actions">
+              <button id="resetProductionParams" class="outline-button" type="button">還原預設</button>
+              <button id="saveProductionParams" class="primary-button compact" type="button">儲存變更</button>
+            </div>
+          </div>
+
+          <div class="config-layout">
+            <section class="config-main">
+              <div class="config-toolbar">
+                <label class="filter-input">
+                  <span>⌕</span>
+                  <input id="productionSearch" type="search" placeholder="搜尋作物、動物或產出品..." />
+                </label>
+                <select id="productionTypeFilter">
+                  <option value="all">全部類型</option>
+                  <option value="作物">作物</option>
+                  <option value="動物">動物</option>
+                </select>
+              </div>
+              <div class="config-table-wrap">
+                <table class="data-table compact-table">
+                  <thead>
+                    <tr>
+                      <th>名稱</th>
+                      <th>類型</th>
+                      <th>解鎖</th>
+                      <th>時間</th>
+                      <th>產出</th>
+                      <th>售價</th>
+                      <th>狀態</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="productionRows"></tbody>
+                </table>
+              </div>
+              <div class="config-footnote">
+                <span>提示：數值保存後會同步寫入模擬稽核日誌。</span>
+                <strong id="productionSummary">0 個項目</strong>
+              </div>
+            </section>
+
+            <aside class="config-editor">
+              <div class="editor-card">
+                <div class="panel-title flat">
+                  <h3>參數編輯器</h3>
+                  <span id="productionEditorBadge" class="status-pill ok">已選取</span>
+                </div>
+                <div id="productionEditorForm" class="editor-form">
+                  <label><span>項目名稱</span><input id="prodName" type="text" /></label>
+                  <label><span>產出品</span><input id="prodOutput" type="text" /></label>
+                  <div class="field-grid-2">
+                    <label><span>解鎖等級</span><input id="prodUnlock" type="number" min="1" /></label>
+                    <label><span>售價</span><input id="prodPrice" type="number" min="0" /></label>
+                  </div>
+                  <div class="field-grid-2">
+                    <label><span>時間(分)</span><input id="prodMinutes" type="number" min="1" /></label>
+                    <label><span>產出數量</span><input id="prodYield" type="number" min="1" /></label>
+                  </div>
+                  <label><span>營運備註</span><textarea id="prodNote" rows="3"></textarea></label>
+                  <label class="switch-row"><span>啟用此項目</span><input id="prodEnabled" type="checkbox" /></label>
+                  <button id="applyProductionEdit" class="primary-button compact" type="button">套用到清單</button>
+                </div>
+              </div>
+
+              <div class="side-card">
+                <h3>平衡檢查</h3>
+                <p><strong id="productionFastCount">0</strong> 個項目低於 5 分鐘，建議確認金幣產出節奏。</p>
+                <p><strong id="productionDisabledCount">0</strong> 個項目目前停用，玩家端不會出現。</p>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section id="recipeConfigPage" class="page">
+          <div class="page-heading with-actions compact-heading">
+            <div>
+              <h2>加工品合成配方管理</h2>
+              <p>管理加工設施、配方材料、製作時間、售價與可見狀態，供活動與商城排程引用。</p>
+            </div>
+            <div class="heading-actions">
+              <button id="addRecipe" class="outline-button" type="button">＋ 新增配方</button>
+              <button id="saveRecipeParams" class="primary-button compact" type="button">儲存配方</button>
+            </div>
+          </div>
+
+          <div class="config-layout recipe-layout">
+            <section class="config-main">
+              <div class="config-toolbar">
+                <label class="filter-input">
+                  <span>⌕</span>
+                  <input id="recipeSearch" type="search" placeholder="搜尋加工品、設施或材料..." />
+                </label>
+                <select id="recipeFacilityFilter">
+                  <option value="all">全部設施</option>
+                  <option value="麵包店">麵包店</option>
+                  <option value="果汁店">果汁店</option>
+                  <option value="蛋糕店">蛋糕店</option>
+                  <option value="咖啡廳">咖啡廳</option>
+                  <option value="漢堡店">漢堡店</option>
+                </select>
+              </div>
+              <div id="recipeCards" class="recipe-grid"></div>
+              <div class="config-footnote">
+                <span>材料會以目前生產參數表的作物與畜產作為校驗基準。</span>
+                <strong id="recipeSummary">0 個配方</strong>
+              </div>
+            </section>
+
+            <aside class="config-editor">
+              <div class="editor-card">
+                <div class="panel-title flat">
+                  <h3>配方編輯器</h3>
+                  <span id="recipeEditorBadge" class="status-pill ok">已選取</span>
+                </div>
+                <div class="editor-form">
+                  <label><span>加工品名稱</span><input id="recipeName" type="text" /></label>
+                  <label><span>加工設施</span><select id="recipeFacility"></select></label>
+                  <div class="field-grid-2">
+                    <label><span>時間(分)</span><input id="recipeMinutes" type="number" min="1" /></label>
+                    <label><span>建議售價</span><input id="recipePrice" type="number" min="0" /></label>
+                  </div>
+                  <div>
+                    <div class="field-label-row">
+                      <span>配方材料</span>
+                      <button id="openIngredientModal" class="link-button success-text" type="button">＋ 新增材料</button>
+                    </div>
+                    <div id="recipeIngredientList" class="ingredient-list"></div>
+                  </div>
+                  <label><span>營運備註</span><textarea id="recipeNote" rows="3"></textarea></label>
+                  <label class="switch-row"><span>啟用此配方</span><input id="recipeEnabled" type="checkbox" /></label>
+                  <button id="applyRecipeEdit" class="primary-button compact" type="button">套用到配方</button>
+                </div>
+              </div>
+
+              <div class="side-card">
+                <h3>配方健康度</h3>
+                <p>平均製作時間 <strong id="recipeAverageTime">0 分</strong></p>
+                <p>缺少材料或停用的配方 <strong id="recipeRiskCount">0</strong> 個</p>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+      </section>
+    </main>
+
+    <div id="overlay" class="overlay hidden"></div>
+
+    <section id="logoutModal" class="modal confirm-modal hidden" role="dialog" aria-modal="true" aria-label="確認登出">
+      <h2>確認登出</h2>
+      <div class="modal-actions centered">
+        <button id="confirmLogout" class="primary-button compact" type="button">是</button>
+        <button id="cancelLogout" class="danger-button" type="button">否</button>
+      </div>
+    </section>
+
+    <section id="exportModal" class="modal export-modal hidden" role="dialog" aria-modal="true" aria-label="匯出員工清單">
+      <button class="modal-close" type="button" data-close-modal>×</button>
+      <header>
+        <h2>匯出員工清單</h2>
+        <p>請選擇欲匯出的資料欄位與時間範圍。</p>
+      </header>
+      <div class="modal-body">
+        <p class="field-title">選擇匯出欄位</p>
+        <div class="export-options">
+          <label><input type="checkbox" />員工姓名 (Name)</label>
+          <label><input type="checkbox" />職位角色 (Role)</label>
+          <label><input type="checkbox" />所屬部門 (Department)</label>
+          <label><input type="checkbox" />聯絡電話 (Phone)</label>
+          <label><input type="checkbox" />電子郵件 (Email)</label>
+          <label><input type="checkbox" />薪資資訊 (Salary)</label>
+        </div>
+        <p class="field-title">匯出時間範圍</p>
+        <div class="date-grid">
+          <label><span>開始日期</span><input type="text" value="01/01/2025" /></label>
+          <label><span>結束日期</span><input type="text" value="12/31/2025" /></label>
+        </div>
+        <div class="file-estimate">
+          <strong>▣ 預期檔案格式</strong>
+          <span>CSV (Comma Separated Values)</span>
+          <b>~2.4 MB</b>
+        </div>
+      </div>
+      <footer>
+        <button class="outline-button" type="button" data-close-modal>取消</button>
+        <button id="downloadCsv" class="primary-button compact" type="button">⇩ 下載 CSV</button>
+      </footer>
+    </section>
+
+    <section id="successModal" class="modal success-modal hidden" role="dialog" aria-modal="true" aria-label="下載成功">
+      <div class="success-check">✓</div>
+      <h2 id="successTitle">下載成功</h2>
+      <p class="notice">♢ 此動作已同步記錄至「系統操作稽核日誌」中。</p>
+      <button class="primary-button" type="button" data-close-modal>確認</button>
+    </section>
+
+    <section id="permissionSuccessModal" class="modal success-modal hidden" role="dialog" aria-modal="true" aria-label="設定成功">
+      <div class="success-check">✓</div>
+      <h2>設定已成功儲存</h2>
+      <p class="notice">♢ 此動作已同步記錄至「系統操作稽核日誌」中。</p>
+      <button class="primary-button" type="button" data-close-modal>確認</button>
+    </section>
+
+    <section id="roleSuccessModal" class="modal success-modal hidden" role="dialog" aria-modal="true" aria-label="角色新增成功">
+      <div class="success-check">✓</div>
+      <h2>角色新增成功</h2>
+      <p class="notice">♢ 此動作已同步記錄至「系統操作稽核日誌」中。</p>
+      <button class="primary-button" type="button" data-close-modal>確認</button>
+    </section>
+
+    <section id="cancelChangesModal" class="modal warning-modal hidden" role="dialog" aria-modal="true" aria-label="取消修改">
+      <div class="warning-icon">△</div>
+      <h2>確定取消修改嗎</h2>
+      <p>您剛才進行的排程設定將不會被儲存。<br />此操作無法還原。</p>
+      <div class="modal-actions centered">
+        <button class="outline-button" type="button" data-close-modal>繼續編輯</button>
+        <button id="discardPermissionChanges" class="danger-button" type="button">放棄變更</button>
+      </div>
+    </section>
+
+    <section id="addRoleModal" class="modal form-modal hidden" role="dialog" aria-modal="true" aria-label="新增自訂角色">
+      <button class="modal-close" type="button" data-close-modal>×</button>
+      <header>
+        <h2>新增自訂角色</h2>
+      </header>
+      <div class="modal-body">
+        <label class="stack-field">
+          <span>角色名稱 (Role Name) *</span>
+          <input id="newRoleName" type="text" placeholder="例如：實習生、外部稽核員..." />
+        </label>
+        <label class="stack-field">
+          <span>角色描述 (Description)</span>
+          <textarea id="newRoleDesc" placeholder="例如：實習生、外部稽核員..."></textarea>
+        </label>
+      </div>
+      <footer>
+        <button class="link-button" type="button" data-close-modal>取消</button>
+        <button id="createRole" class="primary-button compact" type="button">建立角色</button>
+      </footer>
+    </section>
+
+    <section id="confirmAddRoleModal" class="modal confirm-add-modal hidden" role="dialog" aria-modal="true" aria-label="確認新增角色">
+      <div class="warning-icon amber">△</div>
+      <h2>確定要新增角色嗎？</h2>
+      <div class="modal-actions centered">
+        <button class="outline-button" type="button" data-close-modal>取消</button>
+        <button id="confirmCreateRole" class="primary-button compact" type="button">確認</button>
+      </div>
+    </section>
+
+    <section id="logExportModal" class="modal log-export-modal hidden" role="dialog" aria-modal="true" aria-label="匯出日誌報表">
+      <button class="modal-close" type="button" data-close-modal>×</button>
+      <header>
+        <h2>匯出日誌報表</h2>
+      </header>
+      <div class="modal-body">
+        <p class="field-title">時間範圍</p>
+        <div class="range-tabs">
+          <button class="active" type="button">最近 7 天</button>
+          <button type="button">本月</button>
+          <button type="button">自訂區間</button>
+        </div>
+        <button class="date-button compact-date" type="button">▣ 2026-05-07 - 2026-05-21</button>
+
+        <p class="field-title">選擇種類</p>
+        <div class="log-check-grid">
+          <label><input type="checkbox" />數據報表</label>
+          <label><input type="checkbox" />系統維護</label>
+          <label><input type="checkbox" />權限與帳號管理</label>
+          <label><input type="checkbox" />玩家管理與客訴</label>
+          <label><input type="checkbox" />商城與活動設定</label>
+        </div>
+
+        <p class="field-title">檔案格式</p>
+        <div class="format-radios">
+          <label><input type="radio" name="log-format" checked />CSV</label>
+          <label><input type="radio" name="log-format" />Excel (.xlsx)</label>
+          <label><input type="radio" name="log-format" />PDF</label>
+        </div>
+      </div>
+      <footer>
+        <button class="link-button" type="button" data-close-modal>取消</button>
+        <button id="confirmLogExport" class="primary-button compact" type="button">⇩ 確認匯出</button>
+      </footer>
+    </section>
+
+    <section id="auditDetailModal" class="modal form-modal wide-form hidden" role="dialog" aria-modal="true" aria-label="日誌詳情">
+      <button class="modal-close" type="button" data-close-modal>×</button>
+      <header>
+        <h2>日誌詳情</h2>
+        <p id="auditDetailId">LOG-0000</p>
+      </header>
+      <div id="auditDetailBody" class="modal-body detail-list"></div>
+      <footer>
+        <button id="copyAuditDetail" class="outline-button" type="button">複製詳情</button>
+        <button class="primary-button compact" type="button" data-close-modal>確認</button>
+      </footer>
+    </section>
+
+    <section id="dateRangeModal" class="modal form-modal hidden" role="dialog" aria-modal="true" aria-label="選擇日期範圍">
+      <button class="modal-close" type="button" data-close-modal>×</button>
+      <header><h2>選擇日期範圍</h2></header>
+      <div class="modal-body">
+        <div class="range-tabs audit-range-tabs">
+          <button class="active" type="button" data-range="2026-05-07 - 2026-05-25">最近 19 天</button>
+          <button type="button" data-range="2026-05-01 - 2026-05-31">本月</button>
+          <button type="button" data-range="2026-04-01 - 2026-06-02">近 90 天</button>
+        </div>
+        <div class="date-grid">
+          <label><span>開始日期</span><input id="auditStartDate" type="text" value="2026-05-07" /></label>
+          <label><span>結束日期</span><input id="auditEndDate" type="text" value="2026-05-25" /></label>
+        </div>
+      </div>
+      <footer>
+        <button class="link-button" type="button" data-close-modal>取消</button>
+        <button id="applyAuditDateRange" class="primary-button compact" type="button">套用範圍</button>
+      </footer>
+    </section>
+
+    <section id="eventPlanModal" class="modal form-modal wide-form hidden" role="dialog" aria-modal="true" aria-label="新增活動方案">
+      <button class="modal-close" type="button" data-close-modal>×</button>
+      <header><h2>新增活動方案</h2></header>
+      <div class="modal-body two-col-form">
+        <label class="stack-field"><span>活動名稱 *</span><input id="eventName" type="text" placeholder="例如：夏日海島祭 2026" /></label>
+        <label class="stack-field"><span>活動狀態</span><select id="eventStatus"><option>預告中</option><option>進行中</option><option>已結束</option></select></label>
+        <label class="stack-field"><span>開始日期</span><input id="eventStart" type="text" value="2026-07-01" /></label>
+        <label class="stack-field"><span>結束日期</span><input id="eventEnd" type="text" value="2026-07-14" /></label>
+        <label class="stack-field wide"><span>活動描述</span><textarea id="eventDescription" placeholder="輸入活動規則、參與條件與任務摘要..."></textarea></label>
+      </div>
+      <footer>
+        <button class="link-button" type="button" data-close-modal>取消</button>
+        <button id="createEventPlan" class="primary-button compact" type="button">建立活動方案</button>
+      </footer>
+    </section>
+
+    <section id="eventDetailModal" class="modal form-modal wide-form hidden" role="dialog" aria-modal="true" aria-label="活動管理細節">
+      <button class="modal-close" type="button" data-close-modal>×</button>
+      <header><h2>金秋豐收節 2024</h2><p>活動細節管理</p></header>
+      <div class="modal-body event-detail-grid">
+        <article><strong>目前進度</strong><span>88%</span></article>
+        <article><strong>參與玩家</strong><span>842,901</span></article>
+        <article><strong>任務完成</strong><span>64.5%</span></article>
+        <article><strong>剩餘天數</strong><span>12 天</span></article>
+      </div>
+      <footer>
+        <button class="outline-button" type="button" data-close-modal>關閉</button>
+        <button class="primary-button compact" type="button" data-close-modal>儲存細節</button>
+      </footer>
+    </section>
+
+    <section id="eventAnalyticsModal" class="modal form-modal wide-form hidden" role="dialog" aria-modal="true" aria-label="活動數據分析">
+      <button class="modal-close" type="button" data-close-modal>×</button>
+      <header><h2>活動數據分析</h2></header>
+      <div class="modal-body analytics-list">
+        <p><span>玩家參與率</span><strong>72.4%</strong></p>
+        <p><span>任務平均完成率</span><strong>64.5%</strong></p>
+        <p><span>獎勵領取量</span><strong>1.8M</strong></p>
+        <p><span>活動商城轉換率</span><strong>8.6%</strong></p>
+      </div>
+      <footer><button class="primary-button compact" type="button" data-close-modal>確認</button></footer>
+    </section>
+
+    <section id="taskEditModal" class="modal form-modal hidden" role="dialog" aria-modal="true" aria-label="編輯活動任務">
+      <button class="modal-close" type="button" data-close-modal>×</button>
+      <header><h2>編輯活動任務</h2></header>
+      <div class="modal-body">
+        <label class="stack-field"><span>任務內容</span><input id="editTaskName" type="text" /></label>
+        <label class="stack-field"><span>獎勵詳情</span><input id="editTaskReward" type="text" /></label>
+        <label class="stack-field"><span>狀態</span><select id="editTaskStatus"><option>活躍</option><option>待上線</option></select></label>
+      </div>
+      <footer>
+        <button class="link-button" type="button" data-close-modal>取消</button>
+        <button id="saveTaskEdit" class="primary-button compact" type="button">儲存任務</button>
+      </footer>
+    </section>
+
+    <section id="deleteTaskModal" class="modal warning-modal hidden" role="dialog" aria-modal="true" aria-label="刪除任務">
+      <div class="warning-icon">△</div>
+      <h2>確定刪除此任務嗎</h2>
+      <p>刪除後將從活動任務清單移除。<br />此操作無法還原。</p>
+      <div class="modal-actions centered">
+        <button class="outline-button" type="button" data-close-modal>取消</button>
+        <button id="confirmDeleteTask" class="danger-button" type="button">刪除</button>
+      </div>
+    </section>
+
+    <section id="rewardModal" class="modal form-modal hidden" role="dialog" aria-modal="true" aria-label="新增獎勵道具">
+      <button class="modal-close" type="button" data-close-modal>×</button>
+      <header><h2>新增獎勵道具</h2></header>
+      <div class="modal-body">
+        <label class="stack-field"><span>道具名稱</span><input id="rewardName" type="text" placeholder="例如：金幣" /></label>
+        <label class="stack-field"><span>數量</span><input id="rewardQty" type="number" value="1" min="1" /></label>
+      </div>
+      <footer>
+        <button class="link-button" type="button" data-close-modal>取消</button>
+        <button id="confirmAddReward" class="primary-button compact" type="button">加入附件</button>
+      </footer>
+    </section>
+
+    <section id="sendMailConfirmModal" class="modal confirm-add-modal hidden" role="dialog" aria-modal="true" aria-label="確認發送全服信件">
+      <div class="warning-icon amber">△</div>
+      <h2>確認立即發送全服信件？</h2>
+      <div class="modal-actions centered">
+        <button class="outline-button" type="button" data-close-modal>取消</button>
+        <button id="confirmSendMail" class="primary-button compact" type="button">確認發送</button>
+      </div>
+    </section>
+
+    <section id="mailSuccessModal" class="modal success-modal hidden" role="dialog" aria-modal="true" aria-label="信件發送成功">
+      <div class="success-check">✓</div>
+      <h2>全服信件已送出</h2>
+      <p class="notice">♢ 此動作已同步記錄至「系統操作稽核日誌」中。</p>
+      <button class="primary-button" type="button" data-close-modal>確認</button>
+    </section>
+
+    <section id="languageModal" class="modal setting-choice-modal hidden" role="dialog" aria-modal="true" aria-label="介面語言">
+      <header><h2>介面語言</h2><p>選擇您偏好的介面顯示語言，更改後將於下次啟動後生效。</p></header>
+      <div class="choice-list" id="languageChoices"></div>
+      <footer>
+        <button class="link-button" type="button" data-close-modal>取消</button>
+        <button id="saveLanguage" class="primary-button compact" type="button">儲存更改</button>
+      </footer>
+    </section>
+
+    <section id="fontSizeModal" class="modal setting-choice-modal hidden" role="dialog" aria-modal="true" aria-label="文字大小">
+      <header><h2>介面文字大小</h2><p>選擇您偏好的介面文字大小，更改後將於下次啟動後生效。</p></header>
+      <div class="choice-list" id="fontSizeChoices"></div>
+      <footer>
+        <button class="link-button" type="button" data-close-modal>取消</button>
+        <button id="saveFontSize" class="primary-button compact" type="button">儲存更改</button>
+      </footer>
+    </section>
+
+    <section id="idleTimeModal" class="modal setting-choice-modal idle-choice-modal hidden" role="dialog" aria-modal="true" aria-label="閒置時間">
+      <aside class="security-note">
+        <span>⏱</span>
+        <h3>安全說明</h3>
+        <p>為了保障帳號安全，當系統偵測到您在指定時間內無任何操作時，將自動為您執行安全登出。</p>
+      </aside>
+      <section class="idle-choice-card">
+        <header><h2>選擇閒置時間</h2></header>
+        <div class="choice-list" id="idleTimeChoices"></div>
+        <footer>
+          <button class="link-button" type="button" data-close-modal>取消</button>
+          <button id="saveIdleTime" class="primary-button compact" type="button">儲存更改</button>
+        </footer>
+      </section>
+    </section>
+
+    <section id="settingsSavedModal" class="modal success-modal hidden" role="dialog" aria-modal="true" aria-label="設定已成功儲存">
+      <div class="success-check">✓</div>
+      <h2>設定已成功儲存</h2>
+      <p>設定將於下次啟動時更改</p>
+      <button class="primary-button" type="button" data-close-modal>確認</button>
+    </section>
+
+    <section id="configSavedModal" class="modal success-modal hidden" role="dialog" aria-modal="true" aria-label="配置已成功儲存">
+      <div class="success-check">✓</div>
+      <h2 id="configSavedTitle">配置已成功儲存</h2>
+      <p>此操作已同步記錄至系統操作稽核日誌中。</p>
+      <button class="primary-button" type="button" data-close-modal>確認</button>
+    </section>
+
+    <section id="ingredientModal" class="modal form-modal hidden" role="dialog" aria-modal="true" aria-label="新增配方材料">
+      <button class="modal-close" type="button" data-close-modal>×</button>
+      <header><h2>新增配方材料</h2></header>
+      <div class="modal-body">
+        <label><span>材料名稱</span><input id="ingredientName" type="text" placeholder="例如：小麥" /></label>
+        <label><span>數量</span><input id="ingredientQty" type="number" min="1" value="1" /></label>
+      </div>
+      <footer>
+        <button class="link-button" type="button" data-close-modal>取消</button>
+        <button id="confirmAddIngredient" class="primary-button compact" type="button">新增材料</button>
+      </footer>
+    </section>
+
+    <section id="shopSuccessModal" class="modal success-modal hidden" role="dialog" aria-modal="true" aria-label="商品排程成功">
+      <div class="success-check">✓</div>
+      <h2>已成功新增</h2>
+      <p class="notice">♢ 已保存至「商品上架排程」中。</p>
+      <button class="primary-button" type="button" data-close-modal>確認</button>
+    </section>
+
+    <section id="cancelShopModal" class="modal warning-modal hidden" role="dialog" aria-modal="true" aria-label="取消新增商品">
+      <div class="warning-icon">△</div>
+      <h2>確定取消新增嗎</h2>
+      <p>您剛才進行的排程設定將不會被儲存。<br />此操作無法復原。</p>
+      <div class="modal-actions centered">
+        <button class="outline-button" type="button" data-close-modal>繼續編輯</button>
+        <button id="discardShopCreate" class="danger-button" type="button">捨棄變更</button>
+      </div>
+    </section>
+
+    <section id="shopDetailModal" class="modal form-modal wide-form hidden" role="dialog" aria-modal="true" aria-label="商品排程詳情">
+      <button class="modal-close" type="button" data-close-modal>×</button>
+      <header><h2>商品排程詳情</h2><p id="shopDetailSubtitle">商品</p></header>
+      <div id="shopDetailBody" class="modal-body detail-list"></div>
+      <footer><button class="primary-button compact" type="button" data-close-modal>確認</button></footer>
+    </section>
+
+    <section id="revenueExportModal" class="modal log-export-modal hidden" role="dialog" aria-modal="true" aria-label="匯出營收報表">
+      <button class="modal-close" type="button" data-close-modal>×</button>
+      <header><h2>匯出營收報表</h2></header>
+      <div class="modal-body">
+        <p class="field-title">報表範圍</p>
+        <div class="range-tabs"><button class="active" type="button">本月</button><button type="button">本季</button><button type="button">自訂區間</button></div>
+        <p class="field-title">格式</p>
+        <div class="format-radios"><label><input type="radio" name="revenue-format" checked />CSV</label><label><input type="radio" name="revenue-format" />Excel</label><label><input type="radio" name="revenue-format" />PDF</label></div>
+      </div>
+      <footer><button class="link-button" type="button" data-close-modal>取消</button><button id="confirmRevenueExport" class="primary-button compact" type="button">確認匯出</button></footer>
+    </section>
+
+    <section id="playerDetailModal" class="modal form-modal wide-form hidden" role="dialog" aria-modal="true" aria-label="玩家詳情">
+      <button class="modal-close" type="button" data-close-modal>×</button>
+      <header>
+        <h2>玩家詳情</h2>
+        <p id="playerDetailSubtitle">USR-000000</p>
+      </header>
+      <div id="playerDetailBody" class="modal-body detail-list"></div>
+      <footer>
+        <button id="jumpInventoryFromDetail" class="outline-button" type="button">查看背包庫存</button>
+        <button class="primary-button compact" type="button" data-close-modal>確認</button>
+      </footer>
+    </section>
+
+    <section id="playerStatusModal" class="modal warning-modal hidden" role="dialog" aria-modal="true" aria-label="變更玩家狀態">
+      <div class="warning-icon amber">△</div>
+      <h2 id="playerStatusTitle">確認變更玩家狀態？</h2>
+      <p id="playerStatusText">此操作將寫入系統稽核日誌。</p>
+      <div class="modal-actions centered">
+        <button class="outline-button" type="button" data-close-modal>取消</button>
+        <button id="confirmPlayerStatus" class="primary-button compact" type="button">確認</button>
+      </div>
+    </section>
+
+    <section id="compItemModal" class="modal form-modal hidden" role="dialog" aria-modal="true" aria-label="新增補償項目">
+      <button class="modal-close" type="button" data-close-modal>×</button>
+      <header><h2>新增補償項目</h2></header>
+      <div class="modal-body">
+        <label class="stack-field"><span>項目名稱</span><input id="compItemName" type="text" placeholder="例如：鑽石" /></label>
+        <label class="stack-field"><span>分類</span><select id="compItemType"><option>貨幣</option><option>道具</option><option>素材</option></select></label>
+        <label class="stack-field"><span>數量</span><input id="compItemQty" type="number" value="100" min="1" /></label>
+      </div>
+      <footer>
+        <button class="link-button" type="button" data-close-modal>取消</button>
+        <button id="confirmAddCompItem" class="primary-button compact" type="button">加入補償</button>
+      </footer>
+    </section>
+
+    <section id="compConfirmModal" class="modal confirm-add-modal hidden" role="dialog" aria-modal="true" aria-label="確認送出補償">
+      <div class="warning-icon amber">△</div>
+      <h2>確認送出補償？</h2>
+      <p id="compConfirmText">補償將直接派發到指定玩家信箱。</p>
+      <div class="modal-actions centered">
+        <button class="outline-button" type="button" data-close-modal>取消</button>
+        <button id="confirmSubmitComp" class="primary-button compact" type="button">確認送出</button>
+      </div>
+    </section>
+
+    <section id="staffModal" class="modal staff-modal hidden" role="dialog" aria-modal="true" aria-label="員工資訊">
+      <button class="modal-close" type="button" data-close-modal>×</button>
+      <div id="staffProfile"></div>
+      <section class="info-card">
+        <h3>♙ 員工資訊</h3>
+        <div class="info-grid">
+          <label><span>姓名</span><input id="modalName" type="text" /></label>
+          <label><span>ID</span><input id="modalId" type="text" disabled /></label>
+          <label class="wide"><span>EMAIL</span><input id="modalEmail" type="text" /></label>
+        </div>
+      </section>
+      <div class="modal-actions">
+        <button class="outline-button small" type="button" data-close-modal>取消修改</button>
+        <button class="primary-button compact" type="button" data-close-modal>儲存變更設定</button>
+      </div>
+    </section>
+
+    <div id="toast" class="toast hidden">已儲存變更設定</div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
