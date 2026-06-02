@@ -236,6 +236,7 @@ const appView = document.querySelector("#appView");
 const overlay = document.querySelector("#overlay");
 const toast = document.querySelector("#toast");
 let activePermissionRole = "系統管理員";
+let editingStaffIndex = null;
 let editingTaskIndex = null;
 let deletingTaskIndex = null;
 let selectedPlayerUid = players[0].uid;
@@ -244,8 +245,12 @@ let selectedProductionId = productionItems[0].id;
 let selectedRecipeId = recipes[0].id;
 let auditPage = 1;
 let auditSortDesc = true;
-let auditDateRange = ["2026-05-07", "2026-05-25"];
+let auditDateRange = ["2026-05-07", "2026-06-02"];
 const auditPageSize = 6;
+const currentOperator = "#ADM-0822 張偉勤";
+const currentIp = "10.24.18.88";
+const demoToday = "2026-06-02";
+let auditSequence = Math.max(...auditLogs.map((log) => Number(log.id.replace("LOG-", ""))));
 
 function showApp() {
   loginView.classList.add("hidden");
@@ -308,7 +313,7 @@ function renderStaff() {
         <td><span class="role-tag ${person.roleClass}">${person.role}</span></td>
         <td>${person.last}</td>
         <td><span class="${person.statusClass}">● ${person.status}</span></td>
-        <td><button class="text-action" type="button">${person.action}</button></td>
+        <td><button class="text-action" type="button" data-staff-action="${index}">${person.action}</button></td>
       </tr>
     `)
     .join("");
@@ -665,17 +670,24 @@ function renderRevenue() {
 }
 
 function addAuditRecord(action, detail) {
-  const nextId = `LOG-${1018 + auditLogs.length}`;
-  auditLogs.unshift({
-    id: nextId,
-    time: "2026-06-02 19:05",
-    operator: "#ADM-0822 張偉勤",
-    action,
-    detail,
-    ip: "10.24.18.88",
-    result: "成功"
-  });
+  auditSequence += 1;
+  const time = `${demoToday} ${new Date().toLocaleTimeString("zh-TW", { hour12: false, hour: "2-digit", minute: "2-digit" })}`;
+  const log = { id: `LOG-${auditSequence}`, time, operator: currentOperator, action, detail, ip: currentIp, result: "成功" };
+  auditLogs.unshift(log);
+  logs.unshift([time.slice(11), "ZW", "張偉勤", action, log.id, "成功", "ok"]);
+  if (logs.length > 6) logs.pop();
+  if (demoToday > auditDateRange[1]) auditDateRange[1] = demoToday;
+  if (demoToday < auditDateRange[0]) auditDateRange[0] = demoToday;
+  const dateButton = document.querySelector("#dateRangeButton");
+  if (dateButton) dateButton.textContent = `▣ ${auditDateRange[0]} - ${auditDateRange[1]}`;
+  const auditSearch = document.querySelector("#auditSearchInput");
+  const auditFilter = document.querySelector("#auditActionFilter");
+  if (auditSearch) auditSearch.value = "";
+  if (auditFilter) auditFilter.value = "all";
+  auditPage = 1;
+  renderLogs();
   renderAuditLogs();
+  return log;
 }
 
 function formatMinutes(minutes) {
@@ -745,6 +757,7 @@ function applyProductionEditor() {
   item.note = document.querySelector("#prodNote").value.trim();
   item.enabled = document.querySelector("#prodEnabled").checked;
   renderProductionItems();
+  addAuditRecord("遊戲配置", `套用生產參數：${item.name}，時間 ${item.minutes} 分，售價 ${item.price}。`);
   showToast(`${item.name} 參數已套用`);
 }
 
@@ -824,6 +837,7 @@ function applyRecipeEditor() {
   recipe.note = document.querySelector("#recipeNote").value.trim();
   recipe.enabled = document.querySelector("#recipeEnabled").checked;
   renderRecipes();
+  addAuditRecord("遊戲配置", `套用加工配方：${recipe.name}，設施 ${recipe.facility}，時間 ${recipe.minutes} 分。`);
   showToast(`${recipe.name} 配方已套用`);
 }
 
@@ -884,6 +898,7 @@ function saveSetting(type) {
   document.querySelector("#currentLanguageLabel").textContent = settingsState.language;
   document.querySelector("#currentFontSizeLabel").textContent = settingsState.fontSize;
   document.querySelector("#currentIdleLabel").textContent = settingsState.idleTime;
+  addAuditRecord("系統維護", `更新個人設定：${type} = ${settingsState[type]}。`);
   closeModals();
   openModal("#settingsSavedModal");
 }
@@ -923,6 +938,7 @@ function switchPage(pageName, activeButton) {
 
 function openStaffModal(index) {
   const person = staff[index];
+  editingStaffIndex = index;
   document.querySelector("#staffProfile").innerHTML = `
     <article class="profile-card">
       <div class="profile-avatar" style="background:${person.color}">${person.name[0]}</div>
@@ -937,32 +953,32 @@ function openStaffModal(index) {
   openModal("#staffModal");
 }
 
-function downloadCsvFile() {
-  const csvRows = [
-    ["ID", "Name", "Email", "Role", "LastLogin", "Status"],
-    ...staff.map((person) => [person.id, person.name, person.email, person.role, person.last, person.status])
-  ];
-  const csv = csvRows.map((row) => row.map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+function downloadRows(rows, filenameBase, format = "csv") {
+  const extension = format === "xlsx" ? "xlsx" : format === "pdf" ? "pdf" : "csv";
+  const mime = format === "pdf" ? "application/pdf" : "text/csv;charset=utf-8";
+  const content = rows.map((row) => row.map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(",")).join("\n");
+  const blob = new Blob([content], { type: mime });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
-  link.download = "line-brown-farm-staff.csv";
+  link.download = `${filenameBase}.${extension}`;
   link.click();
   URL.revokeObjectURL(link.href);
 }
 
-function downloadAuditCsv() {
-  const csvRows = [
+function downloadCsvFile() {
+  const rows = [
+    ["ID", "Name", "Email", "Role", "LastLogin", "Status"],
+    ...staff.map((person) => [person.id, person.name, person.email, person.role, person.last, person.status])
+  ];
+  downloadRows(rows, "line-brown-farm-staff", "csv");
+}
+
+function downloadAuditReport(format = "csv") {
+  const rows = [
     ["LogID", "Time", "Operator", "Action", "Detail", "IP", "Result"],
     ...getFilteredAuditLogs().map((log) => [log.id, log.time, log.operator, log.action, log.detail, log.ip, log.result])
   ];
-  const csv = csvRows.map((row) => row.map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "line-brown-farm-audit-log.csv";
-  link.click();
-  URL.revokeObjectURL(link.href);
+  downloadRows(rows, "line-brown-farm-audit-log", format);
 }
 
 function openTaskEditor(index) {
@@ -993,6 +1009,7 @@ document.querySelector("#loginForm").addEventListener("submit", (event) => {
   event.preventDefault();
   document.querySelector("#currentRole").textContent = document.querySelector("#roleSelect").value;
   showApp();
+  addAuditRecord("系統維護", `登入系統，角色：${document.querySelector("#roleSelect").value}。`);
 });
 
 document.querySelector("#togglePassword").addEventListener("click", () => {
@@ -1041,6 +1058,7 @@ document.querySelector("#markAllRead").addEventListener("click", () => {
     item.unread = false;
   });
   renderNotifications();
+  addAuditRecord("系統維護", "將通知中心全部標示為已讀。");
 });
 
 document.querySelectorAll("[data-setting-panel]").forEach((button) => {
@@ -1067,6 +1085,7 @@ document.querySelector("#logoutButton").addEventListener("click", () => {
 document.querySelector("#cancelLogout").addEventListener("click", closeModals);
 
 document.querySelector("#confirmLogout").addEventListener("click", () => {
+  addAuditRecord("系統維護", "登出系統。");
   closeModals();
   appView.classList.add("hidden");
   loginView.classList.remove("hidden");
@@ -1089,8 +1108,8 @@ document.querySelector("#auditActionFilter").addEventListener("change", () => {
 document.querySelector("#resetAuditFilters").addEventListener("click", () => {
   document.querySelector("#auditSearchInput").value = "";
   document.querySelector("#auditActionFilter").value = "all";
-  auditDateRange = ["2026-05-07", "2026-05-25"];
-  document.querySelector("#dateRangeButton").textContent = "▣ 2026-05-07 - 2026-05-25";
+  auditDateRange = ["2026-05-07", demoToday];
+  document.querySelector("#dateRangeButton").textContent = `▣ 2026-05-07 - ${demoToday}`;
   auditPage = 1;
   auditSortDesc = true;
   renderAuditLogs();
@@ -1179,10 +1198,9 @@ document.querySelector("#confirmPlayerStatus").addEventListener("click", () => {
   if (player) {
     player.frozen = !player.frozen;
     player.status = player.frozen ? "凍結" : "正常";
-    auditLogs.unshift({ id: `LOG-${1020 + auditLogs.length}`, time: "2026-06-02 18:45", operator: "#ADM-001 管理員", action: "帳號管理", detail: `${player.frozen ? "凍結" : "解凍"}玩家 ${player.uid}。`, ip: "10.24.18.99", result: "成功" });
+    addAuditRecord("玩家管理", `${player.frozen ? "凍結" : "解凍"}玩家 ${player.uid} (${player.name})。`);
     renderPlayerRows();
     renderInventory();
-    renderAuditLogs();
   }
   closeModals();
 });
@@ -1204,7 +1222,11 @@ document.querySelector("#inventoryPlayerList").addEventListener("click", (event)
   selectedPlayerUid = button.dataset.inventoryPlayer;
   renderInventory();
 });
-document.querySelector("#flagInventory").addEventListener("click", () => showToast("已標記此玩家庫存供風控複查"));
+document.querySelector("#flagInventory").addEventListener("click", () => {
+  const player = players.find((item) => item.uid === selectedPlayerUid);
+  addAuditRecord("玩家管理", `標記玩家 ${selectedPlayerUid} (${player?.name || "未知"}) 庫存供風控複查。`);
+  showToast("已標記此玩家庫存供風控複查");
+});
 
 document.querySelector("#addCompItem").addEventListener("click", () => openModal("#compItemModal"));
 document.querySelector("#confirmAddCompItem").addEventListener("click", () => {
@@ -1213,13 +1235,15 @@ document.querySelector("#confirmAddCompItem").addEventListener("click", () => {
   const qty = Number(document.querySelector("#compItemQty").value) || 1;
   compItems.push({ name, type, qty, icon: type === "貨幣" ? "♢" : "▣" });
   renderCompItems();
+  addAuditRecord("帳號管理", `新增客訴補償項目：${name} x ${qty}。`);
   closeModals();
 });
 document.querySelector("#compItems").addEventListener("click", (event) => {
   const removeButton = event.target.closest("[data-remove-comp]");
   if (!removeButton) return;
-  compItems.splice(Number(removeButton.dataset.removeComp), 1);
+  const [removed] = compItems.splice(Number(removeButton.dataset.removeComp), 1);
   renderCompItems();
+  if (removed) addAuditRecord("帳號管理", `移除客訴補償項目：${removed.name}。`);
 });
 document.querySelector("#previewComp").addEventListener("click", () => {
   const uid = document.querySelector("#compUid").value.trim() || "未填 UID";
@@ -1235,9 +1259,8 @@ document.querySelector("#confirmSubmitComp").addEventListener("click", () => {
   const ticket = document.querySelector("#ticketId").value.trim() || "未填客訴單";
   compHistory.unshift({ title: `${uid} ${document.querySelector("#compReason").value}`, date: `已補償 ${compItems.length} 個項目 · ${ticket}` });
   document.querySelector("#compCount").textContent = String(Number(document.querySelector("#compCount").textContent) + 1);
-  auditLogs.unshift({ id: `LOG-${1030 + auditLogs.length}`, time: "2026-06-02 18:45", operator: "#ADM-001 管理員", action: "帳號管理", detail: `針對 ${uid} 建立客訴補償 ${ticket}。`, ip: "10.24.18.99", result: "成功" });
+  addAuditRecord("帳號管理", `針對 ${uid} 建立客訴補償 ${ticket}，共 ${compItems.length} 個項目。`);
   renderCompHistory();
-  renderAuditLogs();
   closeModals();
   document.querySelector("#successTitle").textContent = "補償已送出";
   openModal("#successModal");
@@ -1267,6 +1290,7 @@ document.querySelector("#saveShopSchedule").addEventListener("click", () => {
   });
   renderShopSchedules();
   renderShopCalendar();
+  addAuditRecord("商城活動", `新增商品排程：${name}，期間 ${shopSchedules[0].start} 至 ${shopSchedules[0].end}。`);
   switchPage("shopSchedule");
   openModal("#shopSuccessModal");
 });
@@ -1404,6 +1428,7 @@ document.querySelector("#promotionRows").addEventListener("click", (event) => {
     if (index >= 0) {
       promotions.splice(index, 1);
       renderPromotions();
+      addAuditRecord("商城活動", `刪除促銷方案：${deleteButton.dataset.promoDelete}。`);
       showToast("促銷方案已刪除");
     }
   }
@@ -1431,14 +1456,10 @@ document.querySelector("#orderRows").addEventListener("click", (event) => {
 });
 document.querySelector("#exportRevenue").addEventListener("click", () => openModal("#revenueExportModal"));
 document.querySelector("#confirmRevenueExport").addEventListener("click", () => {
-  const csvRows = [["Product", "Sold", "Revenue", "Conversion"], ...revenueRows];
-  const csv = csvRows.map((row) => row.map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "brown-farm-revenue.csv";
-  link.click();
-  URL.revokeObjectURL(link.href);
+  const format = document.querySelector('input[name="revenue-format"]:checked')?.value || "csv";
+  const rows = [["Product", "Sold", "Revenue", "Conversion"], ...revenueRows];
+  addAuditRecord("數據報表", `匯出商城營收報表 ${format.toUpperCase()}。`);
+  downloadRows(rows, "brown-farm-revenue", format);
   closeModals();
   document.querySelector("#successTitle").textContent = "匯出成功";
   openModal("#successModal");
@@ -1459,11 +1480,14 @@ document.querySelector("#downloadCsv").addEventListener("click", () => {
   downloadCsvFile();
   document.querySelector("#exportModal").classList.add("hidden");
   document.querySelector("#successTitle").textContent = "下載成功";
+  addAuditRecord("帳號管理", "匯出內部員工帳號清單 CSV。");
   openModal("#successModal");
 });
 
 document.querySelector("#confirmLogExport").addEventListener("click", () => {
-  downloadAuditCsv();
+  const format = document.querySelector('input[name="log-format"]:checked')?.value || "csv";
+  addAuditRecord("數據報表", `匯出系統操作稽核日誌報表 ${format.toUpperCase()}。`);
+  downloadAuditReport(format);
   document.querySelector("#logExportModal").classList.add("hidden");
   document.querySelector("#successTitle").textContent = "匯出成功";
   openModal("#successModal");
@@ -1472,6 +1496,7 @@ document.querySelector("#confirmLogExport").addEventListener("click", () => {
 document.querySelector("#createEventPlan").addEventListener("click", () => {
   const name = document.querySelector("#eventName").value.trim() || "新活動方案";
   closeModals();
+  addAuditRecord("活動任務", `建立活動方案：${name}。`);
   showToast(`${name} 已建立`);
 });
 
@@ -1480,12 +1505,37 @@ overlay.addEventListener("click", closeModals);
 
 document.querySelector("#staffRows").addEventListener("click", (event) => {
   const button = event.target.closest("[data-staff-index]");
+  const actionButton = event.target.closest("[data-staff-action]");
   if (button) openStaffModal(Number(button.dataset.staffIndex));
+  if (actionButton) {
+    const person = staff[Number(actionButton.dataset.staffAction)];
+    const willFreeze = person.status !== "已封禁";
+    person.status = willFreeze ? "已封禁" : "活躍中";
+    person.statusClass = willFreeze ? "status-banned" : "status-active";
+    person.action = willFreeze ? "解封" : "凍結";
+    renderStaff();
+    addAuditRecord("帳號管理", `${willFreeze ? "凍結" : "解封"}內部員工帳號 ${person.id} (${person.name})。`);
+  }
+});
+
+document.querySelector("#saveStaffChanges").addEventListener("click", () => {
+  const person = staff[editingStaffIndex];
+  if (!person) return;
+  person.name = document.querySelector("#modalName").value.trim() || person.name;
+  person.email = document.querySelector("#modalEmail").value.trim() || person.email;
+  person.last = `${demoToday} ${new Date().toLocaleTimeString("zh-TW", { hour12: false, hour: "2-digit", minute: "2-digit" })}`;
+  renderStaff();
+  addAuditRecord("帳號管理", `更新內部員工帳號 ${person.id} (${person.name}) 的基本資料。`);
+  closeModals();
+  showToast("員工資料已儲存");
 });
 
 document.querySelector("#permissionRows").addEventListener("click", (event) => {
   const toggle = event.target.closest(".toggle");
-  if (toggle) toggle.classList.toggle("off");
+  if (toggle) {
+    toggle.classList.toggle("off");
+    addAuditRecord("權限安全", `調整 ${activePermissionRole} 的權限切換。`);
+  }
 });
 
 document.querySelector("#taskSearch").addEventListener("input", (event) => renderTasks(event.target.value));
@@ -1508,13 +1558,15 @@ document.querySelector("#saveTaskEdit").addEventListener("click", () => {
     renderTasks(document.querySelector("#taskSearch").value);
   }
   closeModals();
+  addAuditRecord("活動任務", `儲存活動任務：${eventTasks[editingTaskIndex]?.id || "未知任務"}。`);
   showToast("任務已儲存");
 });
 
 document.querySelector("#confirmDeleteTask").addEventListener("click", () => {
   if (deletingTaskIndex !== null) {
-    eventTasks.splice(deletingTaskIndex, 1);
+    const [removed] = eventTasks.splice(deletingTaskIndex, 1);
     renderTasks(document.querySelector("#taskSearch").value);
+    if (removed) addAuditRecord("活動任務", `刪除活動任務：${removed.id} ${removed.name}。`);
   }
   closeModals();
   showToast("任務已刪除");
@@ -1530,7 +1582,10 @@ document.querySelectorAll(".role-tabs button").forEach((button) => {
   });
 });
 
-document.querySelector("#savePermissions").addEventListener("click", () => openModal("#permissionSuccessModal"));
+document.querySelector("#savePermissions").addEventListener("click", () => {
+  addAuditRecord("權限安全", `儲存 ${activePermissionRole} 權限分級設定。`);
+  openModal("#permissionSuccessModal");
+});
 document.querySelector("#cancelPermissionChanges").addEventListener("click", () => openModal("#cancelChangesModal"));
 document.querySelector("#discardPermissionChanges").addEventListener("click", () => {
   closeModals();
@@ -1545,6 +1600,7 @@ document.querySelector("#createRole").addEventListener("click", () => {
 document.querySelector("#confirmCreateRole").addEventListener("click", () => {
   const roleName = document.querySelector("#newRoleName").value.trim() || "自訂角色";
   rolePermissionStates[roleName] = [false, false, false, false, false, false, false];
+  addAuditRecord("權限安全", `新增自訂角色：${roleName}。`);
   closeModals();
   openModal("#roleSuccessModal");
 });
@@ -1555,19 +1611,22 @@ document.querySelector("#confirmAddReward").addEventListener("click", () => {
   const qty = Number(document.querySelector("#rewardQty").value) || 1;
   rewardItems.push({ name, qty, icon: name.includes("鑽") ? "♢" : "ⓢ" });
   renderRewards();
+  addAuditRecord("活動任務", `新增信件獎勵道具：${name} x ${qty}。`);
   closeModals();
 });
 
 document.querySelector("#rewardItems").addEventListener("click", (event) => {
   const removeButton = event.target.closest("[data-remove-reward]");
   if (!removeButton) return;
-  rewardItems.splice(Number(removeButton.dataset.removeReward), 1);
+  const [removed] = rewardItems.splice(Number(removeButton.dataset.removeReward), 1);
   renderRewards();
+  if (removed) addAuditRecord("活動任務", `移除信件獎勵道具：${removed.name}。`);
 });
 
 document.querySelector("#saveMailDraft").addEventListener("click", () => {
   const draftCount = document.querySelector("#draftCount");
   draftCount.textContent = String(Number(draftCount.textContent) + 1);
+  addAuditRecord("活動任務", `儲存全服信件草稿：${document.querySelector("#mailTitle").value.trim() || "未命名草稿"}。`);
   showToast("信件已儲存為草稿");
 });
 
@@ -1576,6 +1635,7 @@ document.querySelector("#confirmSendMail").addEventListener("click", () => {
   const title = document.querySelector("#mailTitle").value.trim() || "全服營運通知";
   mailHistory.unshift({ title, date: "已發送 2026-06-02", active: true });
   renderMailHistory();
+  addAuditRecord("活動任務", `發送全服信件：${title}。`);
   closeModals();
   openModal("#mailSuccessModal");
 });
@@ -1595,6 +1655,7 @@ document.querySelector("#productionRows").addEventListener("click", (event) => {
     item.enabled = !item.enabled;
     selectedProductionId = item.id;
     renderProductionItems();
+    addAuditRecord("遊戲配置", `${item.enabled ? "啟用" : "停用"}生產項目：${item.name}。`);
     showToast(`${item.name} 已${item.enabled ? "啟用" : "停用"}`);
   }
 });
@@ -1604,6 +1665,7 @@ document.querySelector("#resetProductionParams").addEventListener("click", () =>
   selectedProductionId = productionItems[0].id;
   renderProductionItems();
   renderRecipes();
+  addAuditRecord("遊戲配置", "還原動植物生產參數為預設值。");
   showToast("生產參數已還原預設");
 });
 document.querySelector("#saveProductionParams").addEventListener("click", () => {
@@ -1640,6 +1702,7 @@ document.querySelector("#addRecipe").addEventListener("click", () => {
   recipes.unshift(recipe);
   selectedRecipeId = recipe.id;
   renderRecipes();
+  addAuditRecord("遊戲配置", `新增加工配方草稿：${recipe.name}。`);
   showToast("已新增配方草稿");
 });
 document.querySelector("#openIngredientModal").addEventListener("click", () => {
@@ -1661,14 +1724,16 @@ document.querySelector("#confirmAddIngredient").addEventListener("click", () => 
   else recipe.ingredients.push({ name, qty });
   closeModals();
   renderRecipes();
+  addAuditRecord("遊戲配置", `新增配方材料：${recipe.name} 加入 ${name} x ${qty}。`);
 });
 document.querySelector("#recipeIngredientList").addEventListener("click", (event) => {
   const removeButton = event.target.closest("[data-remove-ingredient]");
   if (!removeButton) return;
   const recipe = recipes.find((entry) => entry.id === selectedRecipeId);
   if (!recipe) return;
-  recipe.ingredients.splice(Number(removeButton.dataset.removeIngredient), 1);
+  const [removed] = recipe.ingredients.splice(Number(removeButton.dataset.removeIngredient), 1);
   renderRecipes();
+  if (removed) addAuditRecord("遊戲配置", `移除配方材料：${recipe.name} 移除 ${removed.name}。`);
 });
 
 renderLogs();

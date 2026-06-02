@@ -476,7 +476,7 @@
             </div>
             <div class="log-field">
               <label>選擇日期範圍</label>
-              <button id="dateRangeButton" class="date-button" type="button">▣ 2026-05-07 - 2026-05-25</button>
+              <button id="dateRangeButton" class="date-button" type="button">▣ 2026-05-07 - 2026-06-02</button>
             </div>
             <div class="log-field">
               <label>動作類型</label>
@@ -487,6 +487,9 @@
                 <option>數據報表</option>
                 <option>系統維護</option>
                 <option>活動任務</option>
+                <option>商城活動</option>
+                <option>遊戲配置</option>
+                <option>玩家管理</option>
               </select>
             </div>
             <button id="openLogExport" class="primary-button export-log-button" type="button">⇩ 匯出日誌報表 (PDF/CSV)</button>
@@ -1119,9 +1122,9 @@
 
         <p class="field-title">檔案格式</p>
         <div class="format-radios">
-          <label><input type="radio" name="log-format" checked />CSV</label>
-          <label><input type="radio" name="log-format" />Excel (.xlsx)</label>
-          <label><input type="radio" name="log-format" />PDF</label>
+          <label><input type="radio" name="log-format" value="csv" checked />CSV</label>
+          <label><input type="radio" name="log-format" value="xlsx" />Excel (.xlsx)</label>
+          <label><input type="radio" name="log-format" value="pdf" />PDF</label>
         </div>
       </div>
       <footer>
@@ -1351,7 +1354,7 @@
         <p class="field-title">報表範圍</p>
         <div class="range-tabs"><button class="active" type="button" data-toast="已套用本月營收範圍">本月</button><button type="button" data-toast="已套用本季營收範圍">本季</button><button type="button" data-toast="請於報表欄位選擇自訂區間">自訂區間</button></div>
         <p class="field-title">格式</p>
-        <div class="format-radios"><label><input type="radio" name="revenue-format" checked />CSV</label><label><input type="radio" name="revenue-format" />Excel</label><label><input type="radio" name="revenue-format" />PDF</label></div>
+        <div class="format-radios"><label><input type="radio" name="revenue-format" value="csv" checked />CSV</label><label><input type="radio" name="revenue-format" value="xlsx" />Excel</label><label><input type="radio" name="revenue-format" value="pdf" />PDF</label></div>
       </div>
       <footer><button class="link-button" type="button" data-close-modal>取消</button><button id="confirmRevenueExport" class="primary-button compact" type="button">確認匯出</button></footer>
     </section>
@@ -1416,7 +1419,7 @@
       </section>
       <div class="modal-actions">
         <button class="outline-button small" type="button" data-close-modal>取消修改</button>
-        <button class="primary-button compact" type="button" data-close-modal>儲存變更設定</button>
+        <button id="saveStaffChanges" class="primary-button compact" type="button">儲存變更設定</button>
       </div>
     </section>
 
