@@ -23,20 +23,31 @@ flowchart TB
 ## Context Diagram
 
 Context Diagram 將整個後台視為單一處理程序，重點是呈現外部實體與系統之間交換哪些資料。
+為了方便閱讀，本圖採三欄式排版：左側為後台使用者，中間為系統邊界，右側為外部平台與外部資料來源。
 
 ```mermaid
 flowchart LR
-  Admin[系統管理員]
-  OpsLead[營運主管]
-  Planner[營運企劃]
-  Support[客服人員]
-  Player[遊戲玩家]
-  GameServer[熊大農場遊戲伺服器]
-  LinePlatform[LINE GAME / 推播與信件平台]
-  Payment[金流與訂單平台]
-  Security[資安與稽核單位]
+  subgraph Users[後台使用者]
+    direction TB
+    Admin[系統管理員]
+    OpsLead[營運主管]
+    Planner[營運企劃]
+    Support[客服人員]
+  end
 
-  System([LINE 熊大農場管理系統])
+  subgraph Core[系統邊界]
+    direction TB
+    System([LINE 熊大農場管理系統])
+  end
+
+  subgraph External[外部平台 / 外部資料來源]
+    direction TB
+    Player[遊戲玩家]
+    GameServer[熊大農場遊戲伺服器]
+    LinePlatform[LINE GAME / 推播與信件平台]
+    Payment[金流與訂單平台]
+    Security[資安與稽核單位]
+  end
 
   Admin -->|登入資料、帳號維護、權限設定、稽核查詢| System
   System -->|登入結果、帳號狀態、權限設定結果、稽核報表| Admin
@@ -63,6 +74,11 @@ flowchart LR
 
   System -->|稽核日誌、權限異動紀錄、報表匯出紀錄| Security
   Security -->|稽核需求、合規查核條件| System
+
+  classDef entity fill:#ffffff,stroke:#2f3a35,stroke-width:1px;
+  classDef process fill:#f7fbff,stroke:#2f3a35,stroke-width:1.5px;
+  class Admin,OpsLead,Planner,Support,Player,GameServer,LinePlatform,Payment,Security entity;
+  class System process;
 ```
 
 ### Context Diagram 資料流摘要
@@ -81,36 +97,46 @@ flowchart LR
 ## Diagram-0
 
 Diagram-0 將整體系統拆成主要處理程序，並呈現資料儲存區之間的主要流向。
+為了降低線條交錯，本圖採三欄式排版：左側為外部實體，中間為系統處理程序，右側為資料儲存。
 
 ```mermaid
-flowchart TB
-  Admin[系統管理員]
-  OpsLead[營運主管]
-  Planner[營運企劃]
-  Support[客服人員]
-  GameServer[遊戲伺服器]
-  LinePlatform[LINE GAME / 推播平台]
-  Payment[金流與訂單平台]
-  Security[資安與稽核單位]
+flowchart LR
+  subgraph ExternalEntities[外部實體]
+    direction TB
+    Admin[系統管理員]
+    OpsLead[營運主管]
+    Planner[營運企劃]
+    Support[客服人員]
+    GameServer[遊戲伺服器]
+    LinePlatform[LINE GAME / 推播平台]
+    Payment[金流與訂單平台]
+    Security[資安與稽核單位]
+  end
 
-  P1([1.0 登入、員工帳號與權限控制])
-  P2([2.0 玩家與客服管理])
-  P3([3.0 遊戲配置管理])
-  P4([4.0 商城銷售與營收管理])
-  P5([5.0 活動任務與全服信件管理])
-  P6([6.0 報表匯出與稽核日誌])
-  P7([7.0 儀表板與通知設定])
+  subgraph Processes[系統處理程序]
+    direction TB
+    P1([1.0 登入、員工帳號與權限控制])
+    P2([2.0 玩家與客服管理])
+    P3([3.0 遊戲配置管理])
+    P4([4.0 商城銷售與營收管理])
+    P5([5.0 活動任務與全服信件管理])
+    P6([6.0 報表匯出與稽核日誌])
+    P7([7.0 儀表板與通知設定])
+  end
 
-  D1[[D1 員工帳號資料庫]]
-  D2[[D2 角色權限資料庫]]
-  D3[[D3 玩家資料庫]]
-  D4[[D4 背包與庫存資料庫]]
-  D5[[D5 生產參數與配方資料庫]]
-  D6[[D6 商城商品、促銷與排程資料庫]]
-  D7[[D7 訂單與營收資料庫]]
-  D8[[D8 活動任務與全服信件資料庫]]
-  D9[[D9 系統操作稽核日誌]]
-  D10[[D10 通知與個人設定資料庫]]
+  subgraph DataStores[資料儲存]
+    direction TB
+    D1[[D1 員工帳號資料庫]]
+    D2[[D2 角色權限資料庫]]
+    D3[[D3 玩家資料庫]]
+    D4[[D4 背包與庫存資料庫]]
+    D5[[D5 生產參數與配方資料庫]]
+    D6[[D6 商城商品、促銷與排程資料庫]]
+    D7[[D7 訂單與營收資料庫]]
+    D8[[D8 活動任務與全服信件資料庫]]
+    D9[[D9 系統操作稽核日誌]]
+    D10[[D10 通知與個人設定資料庫]]
+  end
 
   Admin -->|登入資料、帳號維護、權限設定| P1
   OpsLead -->|營運檢視、審核、報表要求| P7
@@ -168,6 +194,13 @@ flowchart TB
   D7 -->|營收指標| P7
   D8 -->|活動任務狀態| P7
   D9 -->|近期操作與警示| P7
+
+  classDef entity fill:#ffffff,stroke:#2f3a35,stroke-width:1px;
+  classDef process fill:#f7fbff,stroke:#2f3a35,stroke-width:1.5px;
+  classDef store fill:#fffef7,stroke:#2f3a35,stroke-width:1.5px;
+  class Admin,OpsLead,Planner,Support,GameServer,LinePlatform,Payment,Security entity;
+  class P1,P2,P3,P4,P5,P6,P7 process;
+  class D1,D2,D3,D4,D5,D6,D7,D8,D9,D10 store;
 ```
 
 ### Diagram-0 處理程序說明
@@ -186,16 +219,27 @@ flowchart TB
 
 ```mermaid
 flowchart LR
-  Admin[系統管理員]
-  Staff[管理人員]
-  P11([1.1 驗證登入與角色])
-  P12([1.2 維護員工帳號])
-  P13([1.3 設定角色權限])
-  P14([1.4 管理個人設定與閒置登出])
-  D1[[D1 員工帳號資料庫]]
-  D2[[D2 角色權限資料庫]]
-  D9[[D9 系統操作稽核日誌]]
-  D10[[D10 通知與個人設定資料庫]]
+  subgraph Actors[外部實體]
+    direction TB
+    Admin[系統管理員]
+    Staff[管理人員]
+  end
+
+  subgraph Processes[處理程序]
+    direction TB
+    P11([1.1 驗證登入與角色])
+    P12([1.2 維護員工帳號])
+    P13([1.3 設定角色權限])
+    P14([1.4 管理個人設定與閒置登出])
+  end
+
+  subgraph Stores[資料儲存]
+    direction TB
+    D1[[D1 員工帳號資料庫]]
+    D2[[D2 角色權限資料庫]]
+    D9[[D9 系統操作稽核日誌]]
+    D10[[D10 通知與個人設定資料庫]]
+  end
 
   Staff -->|角色、帳號、密碼| P11
   P11 <--> D1
@@ -217,21 +261,39 @@ flowchart LR
   P14 <--> D10
   P14 -->|設定保存結果、下次啟動生效| Staff
   P14 -->|設定異動紀錄| D9
+
+  classDef entity fill:#ffffff,stroke:#2f3a35,stroke-width:1px;
+  classDef process fill:#f7fbff,stroke:#2f3a35,stroke-width:1.5px;
+  classDef store fill:#fffef7,stroke:#2f3a35,stroke-width:1.5px;
+  class Admin,Staff entity;
+  class P11,P12,P13,P14 process;
+  class D1,D2,D9,D10 store;
 ```
 
 ## Level-1 DFD：2.0 玩家與客服管理
 
 ```mermaid
 flowchart LR
-  Support[客服人員]
-  GameServer[遊戲伺服器]
-  P21([2.1 玩家基本資料查詢])
-  P22([2.2 背包與庫存查詢])
-  P23([2.3 帳號凍結與解凍])
-  P24([2.4 單筆客訴補償])
-  D3[[D3 玩家資料庫]]
-  D4[[D4 背包與庫存資料庫]]
-  D9[[D9 系統操作稽核日誌]]
+  subgraph Actors[外部實體]
+    direction TB
+    Support[客服人員]
+    GameServer[遊戲伺服器]
+  end
+
+  subgraph Processes[處理程序]
+    direction TB
+    P21([2.1 玩家基本資料查詢])
+    P22([2.2 背包與庫存查詢])
+    P23([2.3 帳號凍結與解凍])
+    P24([2.4 單筆客訴補償])
+  end
+
+  subgraph Stores[資料儲存]
+    direction TB
+    D3[[D3 玩家資料庫]]
+    D4[[D4 背包與庫存資料庫]]
+    D9[[D9 系統操作稽核日誌]]
+  end
 
   Support -->|UID、暱稱、狀態篩選| P21
   P21 <--> D3
@@ -253,20 +315,38 @@ flowchart LR
   GameServer -->|發放成功/失敗| P24
   P24 -->|補償結果| Support
   P24 -->|補償操作紀錄| D9
+
+  classDef entity fill:#ffffff,stroke:#2f3a35,stroke-width:1px;
+  classDef process fill:#f7fbff,stroke:#2f3a35,stroke-width:1.5px;
+  classDef store fill:#fffef7,stroke:#2f3a35,stroke-width:1.5px;
+  class Support,GameServer entity;
+  class P21,P22,P23,P24 process;
+  class D3,D4,D9 store;
 ```
 
 ## Level-1 DFD：3.0 遊戲配置管理
 
 ```mermaid
 flowchart LR
-  Planner[營運企劃]
-  OpsLead[營運主管]
-  GameServer[遊戲伺服器]
-  P31([3.1 動植物生產參數設定])
-  P32([3.2 加工品合成配方管理])
-  P33([3.3 配置預覽與套用])
-  D5[[D5 生產參數與配方資料庫]]
-  D9[[D9 系統操作稽核日誌]]
+  subgraph Actors[外部實體]
+    direction TB
+    Planner[營運企劃]
+    OpsLead[營運主管]
+    GameServer[遊戲伺服器]
+  end
+
+  subgraph Processes[處理程序]
+    direction TB
+    P31([3.1 動植物生產參數設定])
+    P32([3.2 加工品合成配方管理])
+    P33([3.3 配置預覽與套用])
+  end
+
+  subgraph Stores[資料儲存]
+    direction TB
+    D5[[D5 生產參數與配方資料庫]]
+    D9[[D9 系統操作稽核日誌]]
+  end
 
   Planner -->|生產時間、產量、經驗、售價| P31
   P31 <--> D5
@@ -282,23 +362,41 @@ flowchart LR
   P33 -->|正式配置| GameServer
   GameServer -->|套用狀態、異常回報| P33
   P33 -->|配置異動紀錄| D9
+
+  classDef entity fill:#ffffff,stroke:#2f3a35,stroke-width:1px;
+  classDef process fill:#f7fbff,stroke:#2f3a35,stroke-width:1.5px;
+  classDef store fill:#fffef7,stroke:#2f3a35,stroke-width:1.5px;
+  class Planner,OpsLead,GameServer entity;
+  class P31,P32,P33 process;
+  class D5,D9 store;
 ```
 
 ## Level-1 DFD：4.0 商城銷售與營收管理
 
 ```mermaid
 flowchart LR
-  Planner[營運企劃]
-  OpsLead[營運主管]
-  Payment[金流與訂單平台]
-  GameServer[遊戲伺服器]
-  P41([4.1 商品上架與排程])
-  P42([4.2 促銷定價與折扣設定])
-  P43([4.3 玩家訂單紀錄查詢])
-  P44([4.4 營收統計報表匯出])
-  D6[[D6 商城商品、促銷與排程資料庫]]
-  D7[[D7 訂單與營收資料庫]]
-  D9[[D9 系統操作稽核日誌]]
+  subgraph Actors[外部實體]
+    direction TB
+    Planner[營運企劃]
+    OpsLead[營運主管]
+    Payment[金流與訂單平台]
+    GameServer[遊戲伺服器]
+  end
+
+  subgraph Processes[處理程序]
+    direction TB
+    P41([4.1 商品上架與排程])
+    P42([4.2 促銷定價與折扣設定])
+    P43([4.3 玩家訂單紀錄查詢])
+    P44([4.4 營收統計報表匯出])
+  end
+
+  subgraph Stores[資料儲存]
+    direction TB
+    D6[[D6 商城商品、促銷與排程資料庫]]
+    D7[[D7 訂單與營收資料庫]]
+    D9[[D9 系統操作稽核日誌]]
+  end
 
   Planner -->|商品、上架時間、售價、可見性| P41
   P41 <--> D6
@@ -321,22 +419,40 @@ flowchart LR
   P41 -->|商城排程操作紀錄| D9
   P42 -->|促銷異動紀錄| D9
   P44 -->|報表匯出紀錄| D9
+
+  classDef entity fill:#ffffff,stroke:#2f3a35,stroke-width:1px;
+  classDef process fill:#f7fbff,stroke:#2f3a35,stroke-width:1.5px;
+  classDef store fill:#fffef7,stroke:#2f3a35,stroke-width:1.5px;
+  class Planner,OpsLead,Payment,GameServer entity;
+  class P41,P42,P43,P44 process;
+  class D6,D7,D9 store;
 ```
 
 ## Level-1 DFD：5.0 活動任務與全服信件管理
 
 ```mermaid
 flowchart LR
-  Planner[營運企劃]
-  OpsLead[營運主管]
-  GameServer[遊戲伺服器]
-  LinePlatform[LINE GAME / 推播平台]
-  P51([5.1 節慶活動方案管理])
-  P52([5.2 活動任務設定])
-  P53([5.3 全服信件與批次派獎])
-  P54([5.4 活動數據分析])
-  D8[[D8 活動任務與全服信件資料庫]]
-  D9[[D9 系統操作稽核日誌]]
+  subgraph Actors[外部實體]
+    direction TB
+    Planner[營運企劃]
+    OpsLead[營運主管]
+    GameServer[遊戲伺服器]
+    LinePlatform[LINE GAME / 推播平台]
+  end
+
+  subgraph Processes[處理程序]
+    direction TB
+    P51([5.1 節慶活動方案管理])
+    P52([5.2 活動任務設定])
+    P53([5.3 全服信件與批次派獎])
+    P54([5.4 活動數據分析])
+  end
+
+  subgraph Stores[資料儲存]
+    direction TB
+    D8[[D8 活動任務與全服信件資料庫]]
+    D9[[D9 系統操作稽核日誌]]
+  end
 
   Planner -->|活動名稱、期間、規則、狀態| P51
   P51 <--> D8
@@ -360,21 +476,39 @@ flowchart LR
   P51 -->|活動方案操作紀錄| D9
   P52 -->|任務設定操作紀錄| D9
   P53 -->|信件派獎操作紀錄| D9
+
+  classDef entity fill:#ffffff,stroke:#2f3a35,stroke-width:1px;
+  classDef process fill:#f7fbff,stroke:#2f3a35,stroke-width:1.5px;
+  classDef store fill:#fffef7,stroke:#2f3a35,stroke-width:1.5px;
+  class Planner,OpsLead,GameServer,LinePlatform entity;
+  class P51,P52,P53,P54 process;
+  class D8,D9 store;
 ```
 
 ## Level-1 DFD：6.0 報表匯出與稽核日誌
 
 ```mermaid
 flowchart LR
-  Admin[系統管理員]
-  OpsLead[營運主管]
-  Security[資安與稽核單位]
-  P61([6.1 收集操作紀錄])
-  P62([6.2 日誌搜尋與篩選])
-  P63([6.3 報表格式產生])
-  P64([6.4 匯出結果登錄])
-  D7[[D7 訂單與營收資料庫]]
-  D9[[D9 系統操作稽核日誌]]
+  subgraph Actors[外部實體]
+    direction TB
+    Admin[系統管理員]
+    OpsLead[營運主管]
+    Security[資安與稽核單位]
+  end
+
+  subgraph Processes[處理程序]
+    direction TB
+    P61([6.1 收集操作紀錄])
+    P62([6.2 日誌搜尋與篩選])
+    P63([6.3 報表格式產生])
+    P64([6.4 匯出結果登錄])
+  end
+
+  subgraph Stores[資料儲存]
+    direction TB
+    D7[[D7 訂單與營收資料庫]]
+    D9[[D9 系統操作稽核日誌]]
+  end
 
   P61 -->|各模組操作紀錄| D9
   Admin -->|關鍵字、日期、動作類型| P62
@@ -393,6 +527,13 @@ flowchart LR
 
   P63 -->|匯出事件| P64
   P64 -->|報表匯出紀錄| D9
+
+  classDef entity fill:#ffffff,stroke:#2f3a35,stroke-width:1px;
+  classDef process fill:#f7fbff,stroke:#2f3a35,stroke-width:1.5px;
+  classDef store fill:#fffef7,stroke:#2f3a35,stroke-width:1.5px;
+  class Admin,OpsLead,Security entity;
+  class P61,P62,P63,P64 process;
+  class D7,D9 store;
 ```
 
 ## 主要資料儲存區
