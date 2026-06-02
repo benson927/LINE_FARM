@@ -119,10 +119,27 @@ const shopSchedules = [
   { name: "高級化肥組合包", status: "已結束", start: "2026-05-11 00:00", end: "2026-05-13 23:59", price: "1215💎", old: "" }
 ];
 
+const promotionProducts = [
+  { id: "PRD-0042", name: "高級小麥種子", oldPrice: 50, cost: 27.5, icon: "▣" },
+  { id: "PRD-0108", name: "超級農場禮盒", oldPrice: 34.99, cost: 16.2, icon: "◈" },
+  { id: "PRD-0211", name: "金幣包(1000枚)", oldPrice: 5, cost: 1.4, icon: "ⓢ" },
+  { id: "PRD-0305", name: "高級化肥組合包", oldPrice: 12.15, cost: 4.8, icon: "♻" },
+  { id: "PRD-0440", name: "限定皮膚包", oldPrice: 19.99, cost: 7.2, icon: "◇" }
+];
+
+const promotionState = {
+  selectedProductIds: ["PRD-0042"],
+  discountType: "percent",
+  discountValue: 20,
+  start: "",
+  end: "",
+  audiences: ["all"]
+};
+
 const promotions = [
-  ["秋季限定促銷", "30%", "超級農場禮盒", "2026-05-18 - 2026-05-21", "進行中"],
-  ["新手首購折扣", "50%", "新手首充包", "長期", "啟用"],
-  ["VIP 鑽石回饋", "10%", "金幣包/鑽石包", "2026-06-01 - 2026-06-15", "待發布"]
+  { id: "PROMO-1001", name: "高級小麥種子限時折扣", discount: "20%", product: "高級小麥種子", period: "2026-06-05 - 2026-06-12", status: "草稿" },
+  { id: "PROMO-1002", name: "秋季限定促銷", discount: "30%", product: "超級農場禮盒", period: "2026-05-18 - 2026-05-21", status: "進行中" },
+  { id: "PROMO-1003", name: "VIP 鑽石回饋", discount: "10%", product: "金幣包(1000枚)", period: "2026-06-01 - 2026-06-15", status: "待發布" }
 ];
 
 const shopOrders = [
@@ -559,8 +576,77 @@ function renderShopCalendar() {
 
 function renderPromotions() {
   document.querySelector("#promotionRows").innerHTML = promotions
-    .map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join("")}<td><button class="text-action" type="button">編輯</button></td></tr>`)
+    .map((promo) => `
+      <tr>
+        <td><strong>${promo.name}</strong><small>${promo.id}</small></td>
+        <td>${promo.discount}</td>
+        <td>${promo.product}</td>
+        <td>${promo.period}</td>
+        <td><span class="status-pill ${promo.status === "進行中" ? "ok" : "neutral"}">${promo.status}</span></td>
+        <td><span class="row-actions"><button type="button" data-promo-edit="${promo.id}">✎</button><button type="button" data-promo-delete="${promo.id}">⌫</button></span></td>
+      </tr>
+    `)
     .join("");
+}
+
+function getSelectedPromoProduct() {
+  return promotionProducts.find((product) => product.id === promotionState.selectedProductIds[0]) || promotionProducts[0];
+}
+
+function getPromoDiscountMeta() {
+  const meta = {
+    percent: { label: "折扣詳情", unit: "%", max: 95, badge: (value) => `SALE -${value}%`, text: (value) => `${value}%` },
+    fixed: { label: "分級定價", unit: "¥", max: 999, badge: (value) => `VIP ¥${value}`, text: (value) => `¥${value}` },
+    bundle: { label: "買 X 送 Y", unit: "組", max: 20, badge: (value) => `BUY ${value} GET 1`, text: (value) => `買 ${value} 送 1` },
+    wallet: { label: "固定金額減免", unit: "¥", max: 999, badge: (value) => `-¥${value}`, text: (value) => `減免 ¥${value}` }
+  };
+  return meta[promotionState.discountType];
+}
+
+function calculatePromotionPrice(product) {
+  const value = Number(promotionState.discountValue) || 0;
+  if (promotionState.discountType === "percent") return Math.max(0, product.oldPrice * (1 - value / 100));
+  if (promotionState.discountType === "fixed") return Math.max(0, value);
+  if (promotionState.discountType === "wallet") return Math.max(0, product.oldPrice - value);
+  return product.oldPrice;
+}
+
+function renderPromotionSelectedProducts() {
+  const selected = promotionState.selectedProductIds.map((id) => promotionProducts.find((product) => product.id === id)).filter(Boolean);
+  document.querySelector("#promoSelectedProducts").innerHTML = selected.map((product) => `
+    <article class="promo-product-chip">
+      <span>${product.icon}</span>
+      <div><strong>${product.name}</strong><small>ID: ${product.id}</small></div>
+      <button type="button" data-remove-promo-product="${product.id}" aria-label="移除商品">×</button>
+    </article>
+  `).join("") + `
+    <button id="promoAddProduct" class="promo-add-product" type="button">＋ 添加更多產品</button>
+  `;
+}
+
+function renderPromotionPreview() {
+  const product = getSelectedPromoProduct();
+  const meta = getPromoDiscountMeta();
+  const price = calculatePromotionPrice(product);
+  const grossMargin = Math.round(((product.oldPrice - product.cost) / product.oldPrice) * 100);
+  const discountMargin = price > 0 ? Math.round(((price - product.cost) / price) * 100) : 0;
+  const value = Number(promotionState.discountValue) || 0;
+  const lift = promotionState.discountType === "percent" ? 60 + value * 7 : promotionState.discountType === "bundle" ? 118 : 92 + Math.round(value * 2.2);
+
+  document.querySelector("#promoDiscountLabel").textContent = meta.label;
+  document.querySelector("#promoDiscountUnit").textContent = meta.unit;
+  document.querySelector("#promoDiscountValue").max = String(meta.max);
+  document.querySelector("#promoBadge").textContent = meta.badge(value);
+  document.querySelector("#promoPreviewName").textContent = product.name;
+  document.querySelector("#promoPreviewOld").textContent = `¥${product.oldPrice.toFixed(2)}`;
+  document.querySelector("#promoPreviewPrice").textContent = `¥${price.toFixed(2)}`;
+  document.querySelector("#promoGrossMargin").textContent = `${grossMargin}%`;
+  document.querySelector("#promoDiscountMargin").textContent = `${discountMargin}%`;
+  document.querySelector("#promoDiscountMargin").classList.toggle("danger-text", discountMargin < 35);
+  document.querySelector("#promoRevenueLift").textContent = `+${lift}%`;
+  document.querySelector("#promoInsight").textContent = `${product.name} 在目前折扣下預估可提升轉換率，折扣後毛利${discountMargin < 35 ? "偏低，建議縮短有效期或限 VIP" : "維持在安全範圍"}。`;
+  document.querySelectorAll(".discount-type").forEach((button) => button.classList.toggle("active", button.dataset.discountType === promotionState.discountType));
+  renderPromotionSelectedProducts();
 }
 
 function renderOrders() {
@@ -927,6 +1013,14 @@ document.querySelectorAll(".nav-group-head").forEach((button) => {
   });
 });
 
+document.querySelectorAll("[data-toast]").forEach((button) => {
+  button.addEventListener("click", () => showToast(button.dataset.toast));
+});
+
+document.querySelectorAll("[data-page-shortcut]").forEach((button) => {
+  button.addEventListener("click", () => switchPage(button.dataset.pageShortcut));
+});
+
 document.querySelector("#userMenuButton").addEventListener("click", () => {
   closeTopDropdowns("#userMenu");
   document.querySelector("#userMenu").classList.toggle("hidden");
@@ -1150,6 +1244,12 @@ document.querySelector("#confirmSubmitComp").addEventListener("click", () => {
 });
 
 document.querySelector("#openShopCreate").addEventListener("click", () => switchPage("shopCreate"));
+document.querySelectorAll("[data-shop-recommend]").forEach((button) => {
+  button.addEventListener("click", () => {
+    document.querySelector("#shopProductName").value = button.dataset.shopRecommend;
+    showToast(`${button.dataset.shopRecommend} 已填入商品欄位`);
+  });
+});
 document.querySelector("#cancelShopCreate").addEventListener("click", () => openModal("#cancelShopModal"));
 document.querySelector("#discardShopCreate").addEventListener("click", () => {
   closeModals();
@@ -1186,10 +1286,127 @@ document.querySelector("#shopScheduleRows").addEventListener("click", (event) =>
   const button = event.target.closest("[data-shop-detail]");
   if (button) openShopDetail(Number(button.dataset.shopDetail));
 });
-document.querySelector("#addPromotion").addEventListener("click", () => {
-  promotions.unshift(["限時皮膚折扣", "20%", "限定皮膚包", "2026-06-03 - 2026-06-09", "待發布"]);
+document.querySelector("#promoProductSearch").addEventListener("input", (event) => {
+  const keyword = event.target.value.trim().toLowerCase();
+  if (!keyword) return;
+  const matched = promotionProducts.find((product) => `${product.name} ${product.id}`.toLowerCase().includes(keyword));
+  if (matched && !promotionState.selectedProductIds.includes(matched.id)) {
+    promotionState.selectedProductIds = [matched.id];
+    renderPromotionPreview();
+  }
+});
+document.querySelector("#promoSelectedProducts").addEventListener("click", (event) => {
+  const removeButton = event.target.closest("[data-remove-promo-product]");
+  const addButton = event.target.closest("#promoAddProduct");
+  if (removeButton) {
+    promotionState.selectedProductIds = promotionState.selectedProductIds.filter((id) => id !== removeButton.dataset.removePromoProduct);
+    if (!promotionState.selectedProductIds.length) promotionState.selectedProductIds = [promotionProducts[0].id];
+    renderPromotionPreview();
+  }
+  if (addButton) {
+    const next = promotionProducts.find((product) => !promotionState.selectedProductIds.includes(product.id));
+    if (next) {
+      promotionState.selectedProductIds.push(next.id);
+      renderPromotionPreview();
+      showToast(`${next.name} 已加入促銷產品`);
+    }
+  }
+});
+document.querySelectorAll(".discount-type").forEach((button) => {
+  button.addEventListener("click", () => {
+    promotionState.discountType = button.dataset.discountType;
+    if (promotionState.discountType === "percent") promotionState.discountValue = 20;
+    if (promotionState.discountType === "fixed") promotionState.discountValue = 40;
+    if (promotionState.discountType === "bundle") promotionState.discountValue = 2;
+    if (promotionState.discountType === "wallet") promotionState.discountValue = 10;
+    document.querySelector("#promoDiscountValue").value = promotionState.discountValue;
+    renderPromotionPreview();
+  });
+});
+document.querySelector("#promoDiscountValue").addEventListener("input", (event) => {
+  promotionState.discountValue = Number(event.target.value) || 0;
+  renderPromotionPreview();
+});
+document.querySelector("#promoStartDate").addEventListener("input", (event) => {
+  promotionState.start = event.target.value;
+});
+document.querySelector("#promoEndDate").addEventListener("input", (event) => {
+  promotionState.end = event.target.value;
+});
+document.querySelectorAll(".promo-audience").forEach((checkbox) => {
+  checkbox.addEventListener("change", () => {
+    promotionState.audiences = [...document.querySelectorAll(".promo-audience:checked")].map((item) => item.value);
+    if (!promotionState.audiences.length) {
+      checkbox.checked = true;
+      promotionState.audiences = [checkbox.value];
+    }
+    renderPromotionPreview();
+  });
+});
+document.querySelector("#resetPromotionForm").addEventListener("click", () => {
+  promotionState.selectedProductIds = ["PRD-0042"];
+  promotionState.discountType = "percent";
+  promotionState.discountValue = 20;
+  promotionState.start = "";
+  promotionState.end = "";
+  promotionState.audiences = ["all"];
+  document.querySelector("#promoProductSearch").value = "";
+  document.querySelector("#promoDiscountValue").value = "20";
+  document.querySelector("#promoStartDate").value = "";
+  document.querySelector("#promoEndDate").value = "";
+  document.querySelectorAll(".promo-audience").forEach((item) => {
+    item.checked = item.value === "all";
+  });
+  renderPromotionPreview();
+  showToast("促銷表單已重置");
+});
+function upsertPromotion(status) {
+  const product = getSelectedPromoProduct();
+  const meta = getPromoDiscountMeta();
+  const discountText = meta.text(Number(promotionState.discountValue) || 0);
+  const period = `${document.querySelector("#promoStartDate").value || "2026-06-05"} - ${document.querySelector("#promoEndDate").value || "2026-06-12"}`;
+  promotions.unshift({
+    id: `PROMO-${1100 + promotions.length}`,
+    name: `${product.name}${status === "草稿" ? "草稿" : "限時促銷"}`,
+    discount: discountText,
+    product: product.name,
+    period,
+    status
+  });
   renderPromotions();
-  showToast("已新增促銷設定");
+  addAuditRecord("商城活動", `${status === "草稿" ? "儲存" : "發布"}促銷方案：${product.name} ${discountText}。`);
+}
+document.querySelector("#savePromotionDraft").addEventListener("click", () => {
+  upsertPromotion("草稿");
+  showToast("促銷草稿已儲存");
+});
+document.querySelector("#publishPromotion").addEventListener("click", () => {
+  upsertPromotion("待發布");
+  document.querySelector("#successTitle").textContent = "促銷已建立";
+  openModal("#successModal");
+});
+document.querySelector("#promotionRows").addEventListener("click", (event) => {
+  const editButton = event.target.closest("[data-promo-edit]");
+  const deleteButton = event.target.closest("[data-promo-delete]");
+  if (editButton) {
+    const promo = promotions.find((item) => item.id === editButton.dataset.promoEdit);
+    const product = promotionProducts.find((item) => item.name === promo?.product) || promotionProducts[0];
+    promotionState.selectedProductIds = [product.id];
+    const discountNumber = Number(String(promo?.discount || "20").match(/\d+/)?.[0]) || 20;
+    promotionState.discountType = promo?.discount.includes("¥") ? "wallet" : promo?.discount.includes("買") ? "bundle" : "percent";
+    promotionState.discountValue = discountNumber;
+    document.querySelector("#promoDiscountValue").value = String(discountNumber);
+    renderPromotionPreview();
+    showToast(`${promo.name} 已載入編輯器`);
+  }
+  if (deleteButton) {
+    const index = promotions.findIndex((item) => item.id === deleteButton.dataset.promoDelete);
+    if (index >= 0) {
+      promotions.splice(index, 1);
+      renderPromotions();
+      showToast("促銷方案已刪除");
+    }
+  }
 });
 document.querySelector("#orderSearch").addEventListener("input", renderOrders);
 document.querySelector("#orderStatusFilter").addEventListener("change", renderOrders);
@@ -1469,6 +1686,7 @@ renderNotifications();
 renderShopSchedules();
 renderShopCalendar();
 renderPromotions();
+renderPromotionPreview();
 renderOrders();
 renderRevenue();
 renderProductionItems();

@@ -44,7 +44,7 @@
           </label>
 
           <button class="primary-button" type="submit">登入系統</button>
-          <button class="link-button" type="button">忘記密碼？請聯繫 IT 管理員</button>
+          <button class="link-button" type="button" data-toast="已建立 IT 管理員聯繫請求">忘記密碼？請聯繫 IT 管理員</button>
         </form>
       </section>
     </main>
@@ -153,7 +153,7 @@
                 <small>ID: EMP-001</small>
               </div>
             </div>
-            <button type="button">⚙ 帳號設定</button>
+            <button type="button" data-setting-panel="idleTime">⚙ 帳號設定</button>
             <button id="logoutButton" class="danger-link" type="button">↪ 登出系統</button>
           </div>
 
@@ -572,7 +572,7 @@
             <aside class="event-side">
               <article class="side-card calendar-card">
                 <h3>活動日曆</h3>
-                <div class="calendar-head"><button type="button">‹</button><strong>October 2024</strong><button type="button">›</button></div>
+                <div class="calendar-head"><button type="button" data-toast="已切換至上一個月份">‹</button><strong>October 2024</strong><button type="button" data-toast="已切換至下一個月份">›</button></div>
                 <div class="calendar-grid">
                   <b>Su</b><b>Mo</b><b>Tu</b><b>We</b><b>Th</b><b>Fr</b><b>Sa</b>
                   <span class="muted-day">29</span><span class="muted-day">30</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
@@ -627,14 +627,14 @@
                 </table>
               </section>
               <section class="panel recent-shop-log">
-                <div class="panel-title"><h3>最近操作紀錄</h3><button class="link-button success-text" type="button">查看全部</button></div>
+                <div class="panel-title"><h3>最近操作紀錄</h3><button class="link-button success-text" type="button" data-page-shortcut="audit">查看全部</button></div>
                 <ul id="shopRecentLogs"></ul>
               </section>
             </section>
 
             <aside class="shop-side">
               <article class="side-card"><h3>未來 7 天發布</h3><strong class="big-number">5 個新活動</strong><p>下一個：限時皮膚包 <b class="success-text">明天 10:00</b></p></article>
-              <article class="side-card danger-side"><h3>即將結束警示</h3><p>秋季收穫包 <strong class="danger-text">4h</strong></p><p>萬聖節裝飾 <strong>1d</strong></p><button class="outline-button full-button" type="button">查看詳情</button></article>
+              <article class="side-card danger-side"><h3>即將結束警示</h3><p>秋季收穫包 <strong class="danger-text">4h</strong></p><p>萬聖節裝飾 <strong>1d</strong></p><button class="outline-button full-button" type="button" data-toast="已開啟即將結束活動摘要">查看詳情</button></article>
               <article class="side-card"><h3>商品預覽</h3><div class="product-preview-grid"><div></div><div></div></div></article>
             </aside>
           </div>
@@ -650,7 +650,7 @@
               <article class="form-section-card">
                 <h3>▣ 商品基礎信息</h3>
                 <label class="stack-field"><span>選擇上架商品</span><input id="shopProductName" type="text" placeholder="搜索商品名稱或 ID (例如: 超級農場禮盒)" /></label>
-                <div class="tag-row"><button type="button">推薦: 限定皮膚 ＋</button><button type="button">推薦: 種子包裹 ＋</button></div>
+                <div class="tag-row"><button type="button" data-shop-recommend="限定皮膚包">推薦: 限定皮膚 ＋</button><button type="button" data-shop-recommend="種子包裹">推薦: 種子包裹 ＋</button></div>
                 <div class="two-col-form"><label class="stack-field"><span>排程名稱</span><input id="shopScheduleName" type="text" placeholder="例如: 2024 秋季限定促銷" /></label><label class="stack-field"><span>優先級</span><select><option>普通(Normal)</option><option>高(High)</option></select></label></div>
               </article>
               <article class="form-section-card">
@@ -663,15 +663,106 @@
               </div>
             </section>
             <aside class="shop-side">
-              <article class="side-card conflict-card"><h3>△ 衝突檢測 <span>DETECTED</span></h3><p>所選期間內發現 1 個重大活動重疊：</p><div class="conflict-box"><strong>萬聖節主題慶典</strong><small>10月25日 - 11月07日</small><b>重疊 100%</b></div><p>商品流量可能被萬聖節活動商店稀釋。</p><button class="outline-button full-button" type="button">查看完整行事曆</button></article>
+              <article class="side-card conflict-card"><h3>△ 衝突檢測 <span>DETECTED</span></h3><p>所選期間內發現 1 個重大活動重疊：</p><div class="conflict-box"><strong>萬聖節主題慶典</strong><small>10月25日 - 11月07日</small><b>重疊 100%</b></div><p>商品流量可能被萬聖節活動商店稀釋。</p><button class="outline-button full-button" type="button" data-page-shortcut="shopSchedule">查看完整行事曆</button></article>
               <article class="side-card preview-card"><h3>◎ 終端預覽</h3><div class="product-hero"></div><h4>超級農場禮盒</h4><strong>$ 19.99 <small>$34.99</small></strong><p>適用對象: 全體玩家</p></article>
             </aside>
           </div>
         </section>
 
         <section id="shopPromotionsPage" class="page">
-          <div class="page-heading with-actions"><div><h2>促銷定價與折扣設定</h2><p>設定商品折扣、優惠碼與分眾價格。</p></div><button id="addPromotion" class="primary-button compact" type="button">＋ 新增促銷</button></div>
-          <section class="panel"><table><thead><tr><th>促銷名稱</th><th>折扣</th><th>適用商品</th><th>期間</th><th>狀態</th><th>操作</th></tr></thead><tbody id="promotionRows"></tbody></table></section>
+          <div class="page-heading with-actions compact-heading">
+            <div>
+              <p class="breadcrumb">商店與銷售 / <span>促銷定價與折扣設定</span></p>
+              <h2>促銷定價與折扣設定</h2>
+              <p>為商品建立折扣、分眾價格與有效期，並即時檢查毛利與預估收入。</p>
+            </div>
+            <div class="heading-actions">
+              <button id="resetPromotionForm" class="outline-button" type="button">重置</button>
+              <button id="publishPromotion" class="primary-button compact" type="button">發布促銷</button>
+            </div>
+          </div>
+
+          <div class="promotion-layout">
+            <section class="promotion-main">
+              <article class="form-section-card">
+                <h3>▣ 選擇目標產品</h3>
+                <label class="promo-search">
+                  <span>⌕</span>
+                  <input id="promoProductSearch" type="search" placeholder="輸入產品名稱或 ID 進行搜尋..." />
+                </label>
+                <div id="promoSelectedProducts" class="promo-selected-products"></div>
+              </article>
+
+              <article class="form-section-card">
+                <h3>◇ 折扣類型</h3>
+                <div class="discount-type-grid">
+                  <button class="discount-type active" type="button" data-discount-type="percent"><strong>%</strong><span>百分比折扣</span></button>
+                  <button class="discount-type" type="button" data-discount-type="fixed"><strong>⌁</strong><span>分級定價</span></button>
+                  <button class="discount-type" type="button" data-discount-type="bundle"><strong>▣</strong><span>買 X 送 Y</span></button>
+                  <button class="discount-type" type="button" data-discount-type="wallet"><strong>▤</strong><span>固定金額減免</span></button>
+                </div>
+                <label class="stack-field">
+                  <span id="promoDiscountLabel">折扣詳情</span>
+                  <span class="suffix-input">
+                    <input id="promoDiscountValue" type="number" min="1" max="95" value="20" />
+                    <em id="promoDiscountUnit">%</em>
+                  </span>
+                </label>
+              </article>
+
+              <div class="two-col-form">
+                <article class="form-section-card">
+                  <h3>▣ 有效期</h3>
+                  <label class="stack-field"><span>開始日期</span><input id="promoStartDate" type="text" placeholder="mm/dd/yyyy, --:-- --" /></label>
+                  <label class="stack-field"><span>結束日期</span><input id="promoEndDate" type="text" placeholder="mm/dd/yyyy, --:-- --" /></label>
+                </article>
+                <article class="form-section-card">
+                  <h3>⌘ 目標用戶群</h3>
+                  <div class="audience-grid">
+                    <label><input class="promo-audience" type="checkbox" value="all" checked />所有玩家</label>
+                    <label><input class="promo-audience" type="checkbox" value="new" />新玩家</label>
+                    <label><input class="promo-audience" type="checkbox" value="vip" />VIP玩家</label>
+                    <label><input class="promo-audience" type="checkbox" value="inactive" />不活躍玩家</label>
+                  </div>
+                </article>
+              </div>
+
+              <section class="panel promo-history-panel">
+                <div class="panel-title">
+                  <h3>促銷方案清單</h3>
+                  <button id="savePromotionDraft" class="outline-button small" type="button">儲存草稿</button>
+                </div>
+                <table>
+                  <thead><tr><th>促銷名稱</th><th>折扣</th><th>適用商品</th><th>期間</th><th>狀態</th><th>操作</th></tr></thead>
+                  <tbody id="promotionRows"></tbody>
+                </table>
+              </section>
+            </section>
+
+            <aside class="promotion-side">
+              <article class="side-card promo-preview-card">
+                <h3>價格模擬預覽</h3>
+                <div class="promo-product-visual">
+                  <span id="promoBadge">SALE -20%</span>
+                  <strong>▣</strong>
+                </div>
+                <h4 id="promoPreviewName">高級小麥種子</h4>
+                <p><s id="promoPreviewOld">¥50.00</s> <strong id="promoPreviewPrice">¥40.00</strong></p>
+                <div class="margin-lines">
+                  <span>原始毛利 <b id="promoGrossMargin">45%</b></span>
+                  <span>折扣後毛利 <b id="promoDiscountMargin" class="danger-text">32%</b></span>
+                </div>
+              </article>
+
+              <article class="side-card ai-card">
+                <h3>收入預測 AI</h3>
+                <p>預估銷售提升</p>
+                <strong id="promoRevenueLift">+145%</strong>
+                <div class="mini-bars"><i></i><i></i><i></i><i></i><i></i></div>
+                <small id="promoInsight">基於歷史同期活動，20% 折扣預估可提升轉換率。</small>
+              </article>
+            </aside>
+          </div>
         </section>
 
         <section id="shopOrdersPage" class="page">
@@ -734,7 +825,7 @@
               <article class="side-card history-card">
                 <div class="panel-title flat">
                   <h3>歷史發送日誌</h3>
-                  <button class="link-button success-text" type="button">檢視全部</button>
+                  <button class="link-button success-text" type="button" data-page-shortcut="audit">檢視全部</button>
                 </div>
                 <ul id="mailHistory"></ul>
               </article>
@@ -1011,11 +1102,11 @@
       <div class="modal-body">
         <p class="field-title">時間範圍</p>
         <div class="range-tabs">
-          <button class="active" type="button">最近 7 天</button>
-          <button type="button">本月</button>
-          <button type="button">自訂區間</button>
+          <button class="active" type="button" data-toast="已套用最近 7 天範圍">最近 7 天</button>
+          <button type="button" data-toast="已套用本月範圍">本月</button>
+          <button type="button" data-toast="請使用上方日期欄選擇自訂區間">自訂區間</button>
         </div>
-        <button class="date-button compact-date" type="button">▣ 2026-05-07 - 2026-05-21</button>
+        <button class="date-button compact-date" type="button" data-toast="已開啟日期範圍選擇">▣ 2026-05-07 - 2026-05-21</button>
 
         <p class="field-title">選擇種類</p>
         <div class="log-check-grid">
@@ -1258,7 +1349,7 @@
       <header><h2>匯出營收報表</h2></header>
       <div class="modal-body">
         <p class="field-title">報表範圍</p>
-        <div class="range-tabs"><button class="active" type="button">本月</button><button type="button">本季</button><button type="button">自訂區間</button></div>
+        <div class="range-tabs"><button class="active" type="button" data-toast="已套用本月營收範圍">本月</button><button type="button" data-toast="已套用本季營收範圍">本季</button><button type="button" data-toast="請於報表欄位選擇自訂區間">自訂區間</button></div>
         <p class="field-title">格式</p>
         <div class="format-radios"><label><input type="radio" name="revenue-format" checked />CSV</label><label><input type="radio" name="revenue-format" />Excel</label><label><input type="radio" name="revenue-format" />PDF</label></div>
       </div>
