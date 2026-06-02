@@ -380,6 +380,15 @@ select:focus {
   background: var(--soft);
 }
 
+.icon-button.inside-input {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+}
+
 .has-dot::after {
   content: "";
   position: absolute;
